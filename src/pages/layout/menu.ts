@@ -27,6 +27,6 @@ export const menuNav: IMenuNav[] = [
     },
     {
         title: '权限控制',
-        uri: RouteUri.Home,
+        uri: RouteUri.PageSub5,
     },
 ]

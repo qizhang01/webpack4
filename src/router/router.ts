@@ -23,13 +23,6 @@ export const routes: RouteInterface[] = [
                 name: 'layout',
                 routes: [
                     {
-                        path: RouteUri.Home,
-                        component: loadable(() => import('@/pages/home')),
-                        exact: true,
-                        name: 'home',
-                    },
-
-                    {
                         path: RouteUri.PageSub2,
                         component: loadable(() => import('@/pages/page1/page1-sub2')),
                         exact: true,
@@ -44,7 +37,7 @@ export const routes: RouteInterface[] = [
                         component: loadable(() => import('@/pages/page1/page1-sub5')),
                         exact: true,
                         name: 'authorized',
-                        auth: true,
+                        auth: false,
                     },
                     {
                         path: RouteUri.NotAuth,
