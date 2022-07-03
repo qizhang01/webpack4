@@ -28,12 +28,7 @@ export const routes: RouteInterface[] = [
                         exact: true,
                         name: 'home',
                     },
-                    {
-                        path: RouteUri.PageSub1,
-                        component: loadable(() => import('@/pages/page1/page1-sub1')),
-                        exact: true,
-                        auth: false,
-                    },
+
                     {
                         path: RouteUri.PageSub2,
                         component: loadable(() => import('@/pages/page1/page1-sub2')),
