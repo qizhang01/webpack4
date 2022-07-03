@@ -1,0 +1,41 @@
+@import "~antd/lib/style/themes/default.less";
+@import "~antd/dist/antd.less";
+@import "./reset.css";
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", STHeiti, "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Microsoft Yahei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+
+#root {
+    height: 100%;
+
+    #loading-wrapper {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: #00AEEC;
+        z-index: 1000;
+        transition: all 500ms;
+        
+        img {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+    
+    .ant-layout {
+        height: 100%;
+    }
+}
