@@ -41,7 +41,9 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     return (
         <>
             <Header>
-                <Button onClick={logout}>退出</Button>
+                <Button type="primary" size="middle" onClick={logout}>
+                    退出
+                </Button>
             </Header>
             <Layout>
                 <Sider
