@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
 import XLSX from 'xlsx'
+import fetchApi from '@/ajax/index'
+import { message } from 'antd'
 
 const PageSub2: React.FC = () => {
     useEffect(() => {
@@ -24,7 +26,7 @@ const PageSub2: React.FC = () => {
         // // 以二进制方式打开文件
         fileReader.readAsBinaryString(files[0])
 
-        fileReader.onload = function(ev: any) {
+        fileReader.onload = async function(ev: any) {
             try {
                 data = ev.target.result
                 workbook = XLSX.read(data, {
@@ -45,7 +47,17 @@ const PageSub2: React.FC = () => {
             items.map(el => {
                 excelData.push(getExelArray(el))
             })
-            console.log(excelData)
+            const result = await fetchApi(
+                'api/addExcelImportProduct',
+                JSON.stringify(excelData),
+                'POST'
+            )
+            console.log(result)
+            if (result.code == '200') {
+                message.info('提交成功')
+            } else {
+                message.info('提交失败, 请重新提交')
+            }
         }
     }
 
@@ -69,7 +81,7 @@ const PageSub2: React.FC = () => {
             modelType,
             price,
             unit,
-            ifOpen,
+            ifOpen: ifOpen == '是' ? 1 : 0,
             goodsProdAddress,
             buyDate,
             buyNumber,

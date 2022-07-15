@@ -25,16 +25,11 @@ module.exports = {
 		// },
 		proxy: {
 			"/api": {
-					target: "http://129.11.9.16:1000/",
+					target: "http://localhost:3000/",
+					// target: "http://1.117.66.33/",
 					secure: false,
 					changeOrigin: true,
-					pathRewrite:{'^/api': ''}
-			},
-			"/qax":{
-				target: 'http://129.11.9.14:8752/',
-				secure: false,
-				changeOrigin: true,
-				pathRewrite:{'^/qax': ''}
+					// pathRewrite:{'^/api': ''}
 			}
 	  },
 	}

@@ -1,34 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
 import { Button, Space, Table } from 'antd'
+import fetchApi from '@/ajax/index'
 
 interface DataType {
     key: string
     name: string
-    goodsType: string
-    goodsNo: string
-    modelType: string
+    goods_type: string
+    goods_no: string
+    model_type: string
     price: number
     unit: string
-    ifOpen: boolean
-    goodsProdAddress: string
-    buyDate: string
+    ifopen: boolean
+    goods_prod_address: string
+    buy_date: string
     buyNumber: number
-    storeHouse: string
-    deliveryAddress: string
+    store_house: string
+    delivery_address: string
 }
 /*eslint-disable*/
 const columns = [
     {
         title: '商品类别',
-        dataIndex: 'goodsType',
-        key: 'goodsType',
+        dataIndex: 'goods_type',
+        key: 'goods_type',
         //   render: text => <a>{text}</a>,
     },
     {
         title: '商品编号',
-        dataIndex: 'goodsNo',
-        key: 'goodsNo',
+        dataIndex: 'goods_no',
+        key: 'goods_no',
     },
     {
         title: '商品名称',
@@ -37,8 +38,8 @@ const columns = [
     },
     {
         title: '规格型号',
-        dataIndex: 'modelType',
-        key: 'modelType',
+        dataIndex: 'model_type',
+        key: 'model_type',
     },
     {
         title: '采购价',
@@ -52,35 +53,35 @@ const columns = [
     },
     {
         title: '是否启用',
-        dataIndex: 'ifOpen',
-        key: 'ifOpen',
-        render: (text: Boolean) => <a>{text ? '是' : '否'}</a>,
+        dataIndex: 'ifopen',
+        key: 'ifopen',
+        render: (text:number) => <a>{text==1 ? '是' : '否'}</a>,
     },
     {
         title: '产地',
-        dataIndex: 'goodsProdAddress',
-        key: 'goodsProdAddress',
+        dataIndex: 'goods_prod_address',
+        key: 'goods_prod_address',
     },
 
     {
         title: '采购日期',
-        dataIndex: 'buyDate',
-        key: 'buyDate',
+        dataIndex: 'buy_date',
+        key: 'buy_date',
     },
     {
         title: '购买数量',
-        dataIndex: 'buyNumber',
-        key: 'buyNumber',
+        dataIndex: 'buy_number',
+        key: 'buy_number',
     },
     {
         title: '仓库',
-        dataIndex: 'storeHouse',
-        key: 'storeHouse',
+        dataIndex: 'store_house',
+        key: 'store_house',
     },
     {
         title: '收获地址',
-        dataIndex: 'deliveryAddress',
-        key: 'deliveryAddress',
+        dataIndex: 'delivery_address',
+        key: 'delivery_address',
     },
     {
         title: 'Action',
@@ -93,45 +94,18 @@ const columns = [
         ),
     },
 ]
-/*eslint-disable*/
-const data: DataType[] = [
-    {
-        key: '1',
-        name: '静电服白分XXS',
-        goodsType: '070108分体静电服',
-        goodsNo: '1111',
-        modelType: 'WWWDDD',
-        price: 1000,
-        unit: '套',
-        ifOpen: true,
-        goodsProdAddress: '河南郑州',
-        buyDate: '2022/8/5',
-        buyNumber: 10,
-        storeHouse: '',
-        deliveryAddress: '',
-    },
-    {
-        key: '2',
-        name: '车配件',
-        goodsType: '070108分体静电服',
-        goodsNo: '1111',
-        modelType: 'WWWDDD',
-        price: 2000,
-        unit: '套',
-        ifOpen: false,
-        goodsProdAddress: '湖北武汉',
-        buyDate: '2022/8/5',
-        buyNumber: 10,
-        storeHouse: '',
-        deliveryAddress: '',
-    },
-]
+
 const PageContext: React.FC = () => {
+    const [data, setData]= useState([])
     useEffect(() => {
         inputHander()
     }, [])
 
-    const inputHander = () => {}
+    const inputHander = async () => {
+        const result = await fetchApi('api/productlist')
+        console.log(result.data)
+        setData(result.data)
+    }
     return (
         <Panel>
             <Table columns={columns} dataSource={data} />;
