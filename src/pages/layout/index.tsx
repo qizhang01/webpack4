@@ -57,7 +57,7 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                     className="layout-sidebar"
                 >
                     <Menu
-                        defaultSelectedKeys={[RouteUri.PageSub3]}
+                        defaultSelectedKeys={[RouteUri.rkConfig]}
                         mode="inline"
                         theme="dark"
                         multiple={false}
