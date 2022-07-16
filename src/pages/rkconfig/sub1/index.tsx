@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
-import { Button, Space, Table } from 'antd'
+import { Button, Space, Table, Popconfirm } from 'antd'
 import fetchApi from '@/ajax/index'
 import XLSX from 'xlsx'
 interface DataType {
@@ -30,11 +30,13 @@ const columns = [
         title: '商品编号',
         dataIndex: 'goods_no',
         key: 'goods_no',
+        sorter: (a:any, b:any) => a.goods_no.length - b.goods_no.length,
     },
     {
         title: '商品名称',
         dataIndex: 'name',
         key: 'name',
+        sorter: (a:any, b:any) => a.name.length - b.name.length,
     },
     {
         title: '规格型号',
@@ -45,6 +47,7 @@ const columns = [
         title: '采购价',
         dataIndex: 'price',
         key: 'price',
+        sorter: (a:any, b:any) => a.price - b.price,
     },
     {
         title: '计量单位',
@@ -88,13 +91,20 @@ const columns = [
         key: 'action',
         render: (_: any, record: any) => (
           <Space size="middle">
-            <a>修改</a>
-            <a>删除</a>
+            <a onClick={()=>handleClick(record.key)}>{record.ifopen==1?"停用":"启用"}</a>
+            <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
+               <a>删除</a>
+          </Popconfirm>
           </Space>
         ),
     },
 ]
+const handleClick=(key: string)=>{
 
+}
+const handleDelete=(key:string)=>{
+
+}
 const PageContext: React.FC = () => {
     const [data, setData]= useState([])
     useEffect(() => {
@@ -110,18 +120,28 @@ const PageContext: React.FC = () => {
         const content = XLSX.utils.table_to_book(document.getElementById('report-table'))
         XLSX.writeFile(content, `export.xlsx`)
     }
+    const print=()=>{
 
+    }
     return (
         <Panel>
             <Button
                 onClick={exportExcel}
                 style={{ marginLeft: 15 }}
                 type="primary"
-                disabled={false}
+                disabled={data.length==0}
             >
                 导出为excel文件
             </Button>
-            <Table  bordered  columns={columns} dataSource={data} id='report-table'/>;
+            <Button
+                onClick={print}
+                style={{ marginLeft: 15 }}
+                type="primary"
+                disabled={data.length==0}
+            >
+                打印报表
+            </Button>
+            <Table  bordered  style={{marginTop: 10}}columns={columns} dataSource={data} id='report-table'/>;
         </Panel>
     )
 }

@@ -145,8 +145,8 @@ class ReportContainer extends React.Component {
         let { selectYear, showData, isOpen, tableData } = this.state
         return (
            <Panel>
-              <div className="form">
-                    <span style={{ color: '#000' }}>请选择年份</span>
+              <div style={{marginLeft: 30}}>
+                    <span style={{ color: '#000',marginRight:10 }}>请选择年份</span>
                     <DatePicker
                         placeholder="请选择年份"
                         value={selectYear}
