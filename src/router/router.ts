@@ -13,43 +13,41 @@ export const routes: RouteInterface[] = [
         name: 'login',
     },
     {
-        path: RouteUri.Root,
-        component: loadable(() => import('@/pages/root')),
-        name: 'root',
+        path: RouteUri.Layout,
+        component: loadable(() => import('@/pages/layout')),
+        name: 'layout',
         routes: [
             {
-                path: RouteUri.Layout,
-                component: loadable(() => import('@/pages/layout')),
-                name: 'layout',
-                routes: [
-                    {
-                        path: RouteUri.PageSub2,
-                        component: loadable(() => import('@/pages/page1/page1-sub2')),
-                        exact: true,
-                    },
-                    {
-                        path: RouteUri.PageSub3,
-                        component: loadable(() => import('@/pages/page1/page1-sub3')),
-                        exact: true,
-                    },
-                    {
-                        path: RouteUri.PageSub5,
-                        component: loadable(() => import('@/pages/page1/page1-sub5')),
-                        exact: true,
-                        name: 'authorized',
-                        auth: false,
-                    },
-                    {
-                        path: RouteUri.NotAuth,
-                        component: loadable(() => import('@/pages/status/no-auth')),
-                        exact: true,
-                    },
-                    {
-                        path: RouteUri.rkConfig,
-                        component: loadable(() => import('@/pages/rkconfig/sub1')),
-                        exact: true,
-                    },
-                ],
+                path: RouteUri.PageSub2,
+                component: loadable(() => import('@/pages/page1/page1-sub2')),
+                exact: true,
+            },
+            {
+                path: RouteUri.PageSub3,
+                component: loadable(() => import('@/pages/page1/page1-sub3')),
+                exact: true,
+            },
+            {
+                path: RouteUri.PageSub5,
+                component: loadable(() => import('@/pages/page1/page1-sub5')),
+                exact: true,
+                name: 'authorized',
+                auth: false,
+            },
+            {
+                path: RouteUri.NotAuth,
+                component: loadable(() => import('@/pages/status/no-auth')),
+                exact: true,
+            },
+            {
+                path: RouteUri.rkConfig,
+                component: loadable(() => import('@/pages/rkconfig/sub1')),
+                exact: true,
+            },
+            {
+                path: RouteUri.echart,
+                component: loadable(() => import('@/pages/rkconfig/sub2')),
+                exact: true,
             },
         ],
     },

@@ -66,7 +66,7 @@ const useAccount = (props: FormData) => {
 
 const Login: React.FC = () => {
     if (Auth.authContent) {
-        window.location.href = `#${RouteUri.Root}`
+        window.location.href = `#${RouteUri.PageSub3}`
         return <div />
     }
 

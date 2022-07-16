@@ -180,7 +180,7 @@ const PageSub: React.FC = () => {
                         <Button icon={<UploadOutlined />}>Click to upload</Button>
                     </Upload>
                 </Form.Item> */}
-                <div style={{ marginTop: 50 }}>
+                <div style={{ marginTop: 50, marginBottom: 80 }}>
                     <Form.Item wrapperCol={{ span: 3, offset: 9 }}>
                         <Button type="primary" htmlType="submit" block>
                             完成提交

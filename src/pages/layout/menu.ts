@@ -26,6 +26,10 @@ export const menuNav: IMenuNav[] = [
         uri: RouteUri.rkConfig,
     },
     {
+        title: '图形化',
+        uri: RouteUri.echart,
+    },
+    {
         title: '权限控制',
         uri: RouteUri.PageSub5,
     },
