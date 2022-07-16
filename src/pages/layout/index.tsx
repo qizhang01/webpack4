@@ -3,7 +3,7 @@ import { withRouter, Link } from 'react-router-dom'
 import { Layout, Menu, Button } from 'antd'
 import { RenderRoutes } from '@/router/RenderRoutes'
 import { IMenuNav, menuNav } from '@/pages/layout/menu'
-import { Logo } from '@/assets/images'
+// import { Logo } from '@/assets/images'
 import { Auth } from '@/auth'
 import { routeProps } from '@/types/route'
 import './index.less'
@@ -41,6 +41,10 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     return (
         <>
             <Header>
+                <img
+                    src="src/assets/images/logo.jpg"
+                    style={{ height: 44, width: 44, float: 'left', marginTop: 6 }}
+                ></img>
                 <Button type="primary" size="middle" onClick={logout}>
                     退出
                 </Button>
