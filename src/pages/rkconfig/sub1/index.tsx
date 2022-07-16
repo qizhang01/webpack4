@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
 import { Button, Space, Table } from 'antd'
 import fetchApi from '@/ajax/index'
-
+import XLSX from 'xlsx'
 interface DataType {
     key: string
     name: string
@@ -106,9 +106,22 @@ const PageContext: React.FC = () => {
         console.log(result.data)
         setData(result.data)
     }
+    const exportExcel=()=>{
+        const content = XLSX.utils.table_to_book(document.getElementById('report-table'))
+        XLSX.writeFile(content, `export.xlsx`)
+    }
+
     return (
         <Panel>
-            <Table columns={columns} dataSource={data} />;
+            <Button
+                onClick={exportExcel}
+                style={{ marginLeft: 15 }}
+                type="primary"
+                disabled={false}
+            >
+                导出为excel文件
+            </Button>
+            <Table  bordered  columns={columns} dataSource={data} id='report-table'/>;
         </Panel>
     )
 }
