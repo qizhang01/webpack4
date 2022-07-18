@@ -55,7 +55,7 @@ let monthD = {
             name: '趋势图',
             type: 'line',
             stack: '总量',
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            data: [0.2, 0, 0.3, 0.1, 0, 0.8, 0, 0.5, 0, 0.4, 0, 1],
             smooth: true,
             lineStyle: {
                 width: '2',
@@ -157,14 +157,14 @@ class ReportContainer extends React.Component {
                         onChange={this.clearValue}
                         onOpenChange={this.handleOpenChange}
                     ></DatePicker>
-                    <Button
+                    {/* <Button
                         onClick={this.export}
                         style={{ marginLeft: 15 }}
                         type="primary"
                         disabled={tableData.length < 1}
                     >
                         导出为excel文件
-                    </Button>
+                    </Button> */}
                 </div>
                 <div style={{ display: 'flex', flexFlow: 'column', margin: 30 }}>
                     <div style={{ display: 'flex', height: 400, flexShrink: 0 }}>
