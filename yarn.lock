@@ -5692,6 +5692,11 @@
   "resolved" "http://registry.npm.taobao.org/functional-red-black-tree/download/functional-red-black-tree-1.0.1.tgz"
   "version" "1.0.1"
 
+"generate-password@^1.7.0":
+  "integrity" "sha512-WPCtlfy0jexf7W5IbwxGUgpIDvsZIohbI2DAq2Q6TSlKKis+G4GT9sxvPxrZUGL8kP6WUXMWNqYnxY6DDKAdFA=="
+  "resolved" "https://registry.npmmirror.com/generate-password/-/generate-password-1.7.0.tgz"
+  "version" "1.7.0"
+
 "gensync@^1.0.0-beta.2":
   "integrity" "sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg=="
   "resolved" "https://registry.npmmirror.com/gensync/-/gensync-1.0.0-beta.2.tgz"

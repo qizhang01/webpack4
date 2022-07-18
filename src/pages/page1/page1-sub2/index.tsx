@@ -62,19 +62,19 @@ const PageSub2: React.FC = () => {
     }
 
     const getExelArray = (el: any, index: number) => {
-        const goodsType = el['商品类别'].trim()
-        const goodsNo = el['商品编号'].trim()
-        const name = el['商品名称'].trim()
-        const modelType = el['规格型号'].trim()
+        const goodsType = el['商品类别'] ? el['商品类别'].trim() : ''
+        const goodsNo = el['商品编号'] ? el['商品编号'].trim() : ''
+        const name = el['商品名称'] ? el['商品名称'].trim() : ''
+        const modelType = el['规格型号'] ? el['规格型号'].trim() : ''
         const price = el['采购价']
         const unit = el['计量单位'].trim()
-        const ifOpen = el['是否启用'].trim()
+        const ifOpen = el['是否启用'] ? el['是否启用'].trim() : ''
         const goodsProdAddress = el['产地'].trim()
         const buyDate = el['采购日期'].trim()
         const buyNumber = el['采购数量']
         const storeHouse = el['仓库'].trim()
         const deliveryAddress = el['收货地址'].trim()
-        if (name == '' || goodsNo == '' || price == '') {
+        if (name == '' || goodsNo == '' || !price) {
             return message.info(`第${index + 1}行数据异常, 名称,编号或者价格不能为空`)
         }
         return {

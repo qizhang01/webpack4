@@ -12,6 +12,7 @@
     "core-js": "^2.6.9",
     "dynamic-antd-theme": "^0.6.1",
     "echarts-for-react": "^3.0.2",
+    "generate-password": "^1.7.0",
     "qrcode.react": "^1.0.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
