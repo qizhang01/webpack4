@@ -11,5 +11,7 @@ export const Auth = {
         window.localStorage.clear()
         window.location.href = '#/login'
     },
-    loginInfo: JSON.parse(window.localStorage.getItem(AUTH_KEY) as string).data,
+    loginInfo: window.localStorage.getItem(AUTH_KEY)
+        ? JSON.parse(window.localStorage.getItem(AUTH_KEY) as string)
+        : null,
 }

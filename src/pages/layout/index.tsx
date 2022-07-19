@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { withRouter, Link, useHistory } from 'react-router-dom'
-import { Layout, Menu, Button } from 'antd'
+import { Layout, Menu, Button, Popover, Avatar, Modal, Row, Input } from 'antd'
 import { RenderRoutes } from '@/router/RenderRoutes'
 import { IMenuNav, menuNav } from '@/pages/layout/menu'
 import Logo from '@/assets/images/logo.jpg'
@@ -8,12 +8,18 @@ import { Auth } from '@/auth'
 import { routeProps } from '@/types/route'
 import './index.less'
 import { RouteUri } from '@/router/config'
-
+import { UserOutlined } from '@ant-design/icons'
 const { Sider, Header, Content } = Layout
 const SubMenu = Menu.SubMenu
+import fetchAPI from '@/ajax/index'
 
 const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
-    const [collapsed, setCollapsed] = React.useState(false)
+    const [isShowErrText, setIsShowErrText] = React.useState(false)
+    const [warningText, setWarningText] = React.useState('')
+    const [isShowModel, setIsShowModel] = React.useState(false)
+    const [originPassword, setOriginPassword] = React.useState('')
+    const [newPassword, setNewPassword] = React.useState('')
+    const [confirmNewPassword, setConfirmNewPassword] = React.useState('')
     const { routes } = routeProps
     React.useEffect(() => {
         if (!Auth.authContent) {
@@ -42,6 +48,39 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
         Auth.cleanAuth()
     }
 
+    const submitModel = async () => {
+        if (newPassword != confirmNewPassword) {
+            setWarningText('新密码两次输入不相同,请重新输入')
+            return setIsShowErrText(true)
+        }
+        const param = {
+            id: Auth.loginInfo.id,
+            password: originPassword,
+            newpassword: newPassword,
+        }
+        const res = await fetchAPI('api/users/modifypasswordbyself', JSON.stringify(param), 'POST')
+        if (res.code == 200) {
+            setWarningText(res.msg)
+            setOriginPassword('')
+            setNewPassword('')
+            setConfirmNewPassword('')
+            setIsShowErrText(true)
+        }
+    }
+
+    const content = (
+        <div>
+            <p
+                onClick={() => {
+                    setIsShowModel(true)
+                }}
+            >
+                修改密码
+            </p>
+            <p onClick={logout}>退出登录</p>
+        </div>
+    )
+
     return (
         <>
             <Header>
@@ -49,9 +88,12 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                     src={Logo}
                     style={{ height: 44, width: 44, float: 'left', marginTop: 6 }}
                 ></img>
-                <Button type="primary" size="middle" onClick={logout}>
+                {/* <Button type="primary" size="middle" onClick={logout}>
                     退出
-                </Button>
+                </Button> */}
+                <Popover placement="bottomRight" content={content}>
+                    <Avatar style={{ backgroundColor: '#1890ff' }} icon={<UserOutlined />}></Avatar>
+                </Popover>
             </Header>
             <Layout>
                 <Sider
@@ -80,6 +122,100 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                     <Content>{RenderRoutes(routes, true)}</Content>
                 </Layout>
             </Layout>
+            <Modal
+                title="修改密码"
+                wrapClassName="vertical-center-modal"
+                width="600px"
+                visible={isShowModel}
+                onCancel={() => setIsShowModel(false)}
+                footer={[
+                    <Button key="close" onClick={() => setIsShowModel(false)}>
+                        关闭
+                    </Button>,
+                    <Button
+                        key="submit"
+                        type="primary"
+                        disabled={
+                            originPassword == '' || newPassword == '' || confirmNewPassword == ''
+                        }
+                        onClick={submitModel}
+                    >
+                        确定
+                    </Button>,
+                ]}
+            >
+                <Row>
+                    <span
+                        style={{
+                            width: 100,
+                            display: 'inline-block',
+                            textAlign: 'right',
+                        }}
+                    >
+                        原密码:
+                    </span>
+                    <Input
+                        placeholder="请输入原密码"
+                        onChange={e => {
+                            setWarningText('')
+                            setOriginPassword(e.target.value)
+                        }}
+                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                        value={originPassword}
+                    ></Input>
+                </Row>
+                <Row>
+                    <span
+                        style={{
+                            width: 100,
+                            display: 'inline-block',
+                            textAlign: 'right',
+                        }}
+                    >
+                        新密码:
+                    </span>
+                    <Input.Password
+                        placeholder="请输入新密码"
+                        onChange={e => {
+                            setWarningText('')
+                            setNewPassword(e.target.value)
+                        }}
+                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                        value={newPassword}
+                    ></Input.Password>
+                </Row>
+                <Row>
+                    <span
+                        style={{
+                            width: 100,
+                            display: 'inline-block',
+                            textAlign: 'right',
+                        }}
+                    >
+                        新密码:
+                    </span>
+                    <Input.Password
+                        placeholder="请再次输入新密码"
+                        onChange={e => {
+                            setWarningText('')
+                            setConfirmNewPassword(e.target.value)
+                        }}
+                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                        value={confirmNewPassword}
+                    ></Input.Password>
+                </Row>
+                <Row>
+                    <span
+                        style={{
+                            display: isShowErrText ? 'block' : 'none',
+                            color: 'red',
+                            marginLeft: '110px',
+                        }}
+                    >
+                        {warningText}
+                    </span>
+                </Row>
+            </Modal>
         </>
     )
 }

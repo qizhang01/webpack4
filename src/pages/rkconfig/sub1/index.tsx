@@ -22,104 +22,7 @@ interface DataType {
     delivery_address: string
 }
 /*eslint-disable*/
-// const columns = [
-//     {
-//         title: '商品类别',
-//         dataIndex: 'goods_type',
-//         key: 'goods_type',
-//         width: 150
-//         //   render: text => <a>{text}</a>,
-//     },
-//     {
-//         title: '商品编号',
-//         dataIndex: 'goods_no',
-//         key: 'goods_no',
-//         sorter: (a:any, b:any) => a.goods_no.length - b.goods_no.length,
-//     },
-//     {
-//         title: '商品名称',
-//         dataIndex: 'name',
-//         key: 'name',
-//         sorter: (a:any, b:any) => a.name.length - b.name.length,
-//     },
-//     {
-//         title: '规格型号',
-//         dataIndex: 'model_type',
-//         key: 'model_type',
-//     },
-//     {
-//         title: '采购价',
-//         dataIndex: 'price',
-//         key: 'price',
-//         sorter: (a:any, b:any) => a.price - b.price,
-//     },
-//     {
-//         title: '计量单位',
-//         dataIndex: 'unit',
-//         key: 'unit',
-//     },
-//     {
-//         title: '是否启用',
-//         dataIndex: 'ifopen',
-//         key: 'ifopen',
-//         render: (text:number) => <a>{text==1 ? '是' : '否'}</a>,
-//     },
-//     {
-//         title: '产地',
-//         dataIndex: 'goods_prod_address',
-//         key: 'goods_prod_address',
-//     },
 
-//     {
-//         title: '采购日期',
-//         dataIndex: 'buy_date',
-//         key: 'buy_date',
-//     },
-//     {
-//         title: '购买数量',
-//         dataIndex: 'buy_number',
-//         key: 'buy_number',
-//     },
-//     {
-//         title: '仓库',
-//         dataIndex: 'store_house',
-//         key: 'store_house',
-//     },
-//     {
-//         title: '收获地址',
-//         dataIndex: 'delivery_address',
-//         key: 'delivery_address',
-//     },
-//     {
-//         title: 'Action',
-//         key: 'action',
-//         render: (_: any, record: any) => (
-//           <Space size="middle">
-//             <a onClick={()=>handleClick(record.id, record.ifopen)}>{record.ifopen==1?"停用":"启用"}</a>
-//             <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
-//                <a>删除</a>
-//           </Popconfirm>
-//           </Space>
-//         ),
-//     },
-// ]
-// const handleClick=async (id: string, ifopen:number)=>{
-//     const param={
-//         id,
-//         ifopen
-//     }
-//     const result = await fetchApi('api/startorend',JSON.stringify(param),'POST')
-//     if(result.code==200){
-//         const result = await fetchApi('api/productlist')
-//         setData(result.data)
-//     }
-// }
-// const handleDelete=async (id:string)=>{
-//     console.log(id)
-//     const param = {id}
-//     const result = await fetchApi('api/delete',JSON.stringify(param),'POST')
-//     console.log(result.data)
-// }
 const PageContext: React.FC = () => {
     const [data, setData]= useState([])
     useEffect(() => {
@@ -152,24 +55,24 @@ const PageContext: React.FC = () => {
             sorter: (a:any, b:any) => a.goods_no.length - b.goods_no.length,
         },
         {
-            title: '商品名称',
+            title: '名称',
             dataIndex: 'name',
             key: 'name',
             sorter: (a:any, b:any) => a.name.length - b.name.length,
         },
         {
-            title: '规格型号',
+            title: '型号',
             dataIndex: 'model_type',
             key: 'model_type',
         },
         {
-            title: '采购价',
+            title: '价格',
             dataIndex: 'price',
             key: 'price',
             sorter: (a:any, b:any) => a.price - b.price,
         },
         {
-            title: '计量单位',
+            title: '单位',
             dataIndex: 'unit',
             key: 'unit',
         },
@@ -201,7 +104,7 @@ const PageContext: React.FC = () => {
             key: 'store_house',
         },
         {
-            title: '收获地址',
+            title: '收货地址',
             dataIndex: 'delivery_address',
             key: 'delivery_address',
         },
