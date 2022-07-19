@@ -1,9 +1,8 @@
 import React, { useReducer } from 'react'
 import { Input, Button } from 'antd'
 import { Auth } from '@/auth'
-import { RouteUri } from '@/router/config'
 import { useHistory } from 'react-router-dom'
-
+import fetchApi from '@/ajax/index'
 import './index.less'
 
 type Account = {
@@ -49,13 +48,15 @@ const useAccount = (props: FormData) => {
         })
     }
 
-    const onSubmit = () => {
-        const date = new Date()
-        Auth.setAuth(date.valueOf())
+    const onSubmit = async () => {
         setLoading()
+        const result = await fetchApi('api/users/login', JSON.stringify(formData.account), 'POST')
+        if (result.code == 200) {
+            Auth.setAuth(result.data)
+            window.location.href = '#/root/rkconfig'
+        }
         // let history = useHistory()
         // history.push('/root/page-sub1')
-        window.location.href = '#/root/rkconfig'
     }
 
     return { formData, setAccount: { setUsername, setPassword, onSubmit } }

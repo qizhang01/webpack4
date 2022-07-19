@@ -3,12 +3,12 @@ const AUTH_KEY = 'xx-auth-key'
 export const Auth = {
     authContent: window.localStorage.getItem(AUTH_KEY),
 
-    setAuth: (auth: string | number) => {
-        window.localStorage.setItem(AUTH_KEY, `${auth}`)
+    setAuth: (auth: string) => {
+        window.localStorage.setItem(AUTH_KEY, JSON.stringify(auth))
     },
 
     cleanAuth: () => {
-        window.localStorage.setItem(AUTH_KEY, '')
-        window.location.reload()
+        window.localStorage.clear()
+        window.location.href = '#/login'
     },
 }
