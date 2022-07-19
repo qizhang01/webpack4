@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter, Link, useHistory } from 'react-router-dom'
 import { Layout, Menu, Button } from 'antd'
 import { RenderRoutes } from '@/router/RenderRoutes'
 import { IMenuNav, menuNav } from '@/pages/layout/menu'
@@ -15,7 +15,11 @@ const SubMenu = Menu.SubMenu
 const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const [collapsed, setCollapsed] = React.useState(false)
     const { routes } = routeProps
-
+    React.useEffect(() => {
+        if (!Auth.authContent) {
+            window.location.href = '#/login'
+        }
+    })
     const NavMenu = (nav: IMenuNav) => {
         return (
             <Menu.Item key={nav.uri}>

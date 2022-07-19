@@ -1,5 +1,5 @@
 import React from 'react'
-import { HashRouter as Router } from 'react-router-dom'
+import { HashRouter as Router, useHistory } from 'react-router-dom'
 import { RenderRoutes } from '@/router/RenderRoutes'
 import { routes } from '@/router/router'
 import { Loading } from '@/assets/images'
@@ -23,7 +23,10 @@ const App: React.FC = () => {
             }, 400)
         }
     })
-
+    // React.useEffect(() => {
+    //     let history = useHistory()
+    //     history.push('/login')
+    // }, [])
     return (
         <>
             {/*<DynamicColor style={{ display: 'none' }} primaryColor="#77dd66" />*/}

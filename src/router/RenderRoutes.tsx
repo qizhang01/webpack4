@@ -8,20 +8,12 @@ import { RouteUri } from '@/router/config'
 import { Auth } from '@/auth'
 import AnimateSwitch from './animateSwitch'
 import '@/assets/style/animate.less'
-
+import { Route } from 'react-router-dom'
 export const RenderRoutes = (routes: RouteInterface[] | undefined, authed: boolean) => {
-    // 判断是否登录
-    if (!Auth.authContent) {
-        return (
-            <Switch>
-                <Login />
-            </Switch>
-        )
-    }
-
     if (routes) {
         return (
             <Switch>
+                <Route path="/login" component={Login} />
                 {routes.map((route: RouteInterface, index) => {
                     return RouteWithSubRoutes(route, index, authed, RouteUri.NotAuth)
                 })}

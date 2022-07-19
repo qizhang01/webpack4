@@ -47,29 +47,21 @@ const useAccount = (props: FormData) => {
             ...formData,
             loading: true,
         })
-
-        setTimeout(() => {
-            window.location.reload()
-        }, 1000)
     }
 
     const onSubmit = () => {
         const date = new Date()
         Auth.setAuth(date.valueOf())
         setLoading()
-        let history = useHistory()
-        history.push('/root/page-sub1')
+        // let history = useHistory()
+        // history.push('/root/page-sub1')
+        window.location.href = '#/root/rkconfig'
     }
 
     return { formData, setAccount: { setUsername, setPassword, onSubmit } }
 }
 
 const Login: React.FC = () => {
-    if (Auth.authContent) {
-        window.location.href = `#${RouteUri.PageSub3}`
-        return <div />
-    }
-
     // 自定义Hook
     const { formData, setAccount } = useAccount({
         account: { username: '', password: '' },
