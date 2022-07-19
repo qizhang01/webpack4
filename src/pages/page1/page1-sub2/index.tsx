@@ -3,7 +3,7 @@ import { Panel } from '@/components/Panel'
 import XLSX from 'xlsx'
 import fetchApi from '@/ajax/index'
 import { message, Modal } from 'antd'
-
+import { Auth } from '@/auth'
 const PageSub2: React.FC = () => {
     useEffect(() => {
         document.getElementById('import')!.addEventListener('change', e => {
@@ -47,9 +47,10 @@ const PageSub2: React.FC = () => {
             items.map((el, index) => {
                 excelData.push(getExelArray(el, index))
             })
+            const userno = Auth.loginInfo.id
             const result = await fetchApi(
                 'api/addExcelImportProduct',
-                JSON.stringify(excelData),
+                JSON.stringify({ excelData, userno }),
                 'POST'
             )
             console.log(result)
@@ -62,18 +63,18 @@ const PageSub2: React.FC = () => {
     }
 
     const getExelArray = (el: any, index: number) => {
-        const goodsType = el['商品类别'] ? el['商品类别'].trim() : ''
-        const goodsNo = el['商品编号'] ? el['商品编号'].trim() : ''
-        const name = el['商品名称'] ? el['商品名称'].trim() : ''
-        const modelType = el['规格型号'] ? el['规格型号'].trim() : ''
+        const goodsType = el['商品类别']
+        const goodsNo = el['商品编号']
+        const name = el['商品名称']
+        const modelType = el['规格型号']
         const price = el['采购价']
-        const unit = el['计量单位'].trim()
-        const ifOpen = el['是否启用'] ? el['是否启用'].trim() : ''
-        const goodsProdAddress = el['产地'].trim()
-        const buyDate = el['采购日期'].trim()
+        const unit = el['计量单位']
+        const ifOpen = el['是否启用']
+        const goodsProdAddress = el['产地']
+        const buyDate = el['采购日期']
         const buyNumber = el['采购数量']
-        const storeHouse = el['仓库'].trim()
-        const deliveryAddress = el['收货地址'].trim()
+        const storeHouse = el['仓库']
+        const deliveryAddress = el['收货地址']
         if (name == '' || goodsNo == '' || !price) {
             return message.info(`第${index + 1}行数据异常, 名称,编号或者价格不能为空`)
         }

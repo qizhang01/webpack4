@@ -19,7 +19,7 @@ import { Panel } from '@/components/Panel'
 import { useLocation } from 'react-router-dom'
 import './index.less'
 import moment from 'moment'
-
+import { Auth } from '@/auth'
 import fetchApi from '@/ajax/index'
 
 const { Option } = Select
@@ -77,6 +77,7 @@ const PageSub: React.FC = () => {
             store_house,
             delivery_address,
             ifdelete: 0,
+            userno: Auth.loginInfo.id,
         }
         console.log(body)
         const result = await fetchApi('api/addOneProduct', JSON.stringify(body), 'POST')

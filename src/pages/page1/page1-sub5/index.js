@@ -152,7 +152,7 @@ export default class Index extends React.Component {
         });
         const formData = {
             id: record.id,
-            temp_password: password
+            password: password
         }
         const res = await fetchAPI('api/users/updatepassword',JSON.stringify(formData),'POST')
         if(res){
