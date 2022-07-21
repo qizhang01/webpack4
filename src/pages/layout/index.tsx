@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { withRouter, Link, useHistory } from 'react-router-dom'
-import { Layout, Menu, Button, Popover, Avatar, Modal, Row, Input } from 'antd'
+import { Layout, Menu, Button, Dropdown, Avatar, Modal, Row, Input } from 'antd'
 import { RenderRoutes } from '@/router/RenderRoutes'
 import { IMenuNav, menuNav } from '@/pages/layout/menu'
 import Logo from '@/assets/images/logo.jpg'
@@ -8,7 +8,7 @@ import { Auth } from '@/auth'
 import { routeProps } from '@/types/route'
 import './index.less'
 import { RouteUri } from '@/router/config'
-import { UserOutlined } from '@ant-design/icons'
+import { UserOutlined, EditOutlined, LogoutOutlined } from '@ant-design/icons'
 const { Sider, Header, Content } = Layout
 const SubMenu = Menu.SubMenu
 import fetchAPI from '@/ajax/index'
@@ -67,18 +67,34 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
             setIsShowErrText(true)
         }
     }
-
-    const content = (
-        <div>
-            <p
-                onClick={() => {
-                    setIsShowModel(true)
-                }}
-            >
-                修改密码
-            </p>
-            <p onClick={logout}>退出登录</p>
-        </div>
+    const menu = (
+        <Menu
+            items={[
+                {
+                    key: '1',
+                    label: (
+                        <p
+                            onClick={() => {
+                                setIsShowModel(true)
+                            }}
+                            className="vatar-dropdown"
+                        >
+                            <EditOutlined style={{ marginRight: 10 }} />
+                            修改密码
+                        </p>
+                    ),
+                },
+                {
+                    key: '2',
+                    label: (
+                        <p onClick={logout} className="vatar-dropdown">
+                            <LogoutOutlined style={{ marginRight: 10 }} />
+                            退出登录
+                        </p>
+                    ),
+                },
+            ]}
+        />
     )
 
     return (
@@ -88,12 +104,9 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                     src={Logo}
                     style={{ height: 44, width: 44, float: 'left', marginTop: 6 }}
                 ></img>
-                {/* <Button type="primary" size="middle" onClick={logout}>
-                    退出
-                </Button> */}
-                <Popover placement="bottomRight" content={content}>
+                <Dropdown overlay={menu} placement="bottom">
                     <Avatar style={{ backgroundColor: '#1890ff' }} icon={<UserOutlined />}></Avatar>
-                </Popover>
+                </Dropdown>
             </Header>
             <Layout>
                 <Sider
