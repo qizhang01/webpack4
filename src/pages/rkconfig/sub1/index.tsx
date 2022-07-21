@@ -3,7 +3,7 @@ import { Panel } from '@/components/Panel'
 import { Button, Space, Table, Popconfirm, message, Input } from 'antd'
 import fetchApi from '@/ajax/index'
 import XLSX from 'xlsx'
-
+import { Auth } from '@/auth'
 const { Search } = Input
 
 interface DataType {
@@ -30,7 +30,7 @@ const PageContext: React.FC = () => {
     }, [])
     
     const inputHander = async () => {
-        const result = await fetchApi('api/productlist')
+        const result = await fetchProductlist()
         setData(result.data)
     }
     const exportExcel=()=>{
@@ -39,6 +39,10 @@ const PageContext: React.FC = () => {
     }
     const print=()=>{
 
+    }
+    const fetchProductlist = async ()=>{
+        const result = await fetchApi('api/productlist', JSON.stringify(Auth.loginInfo),'POST')
+        return result
     }
     const columns = [
         {
@@ -128,7 +132,7 @@ const PageContext: React.FC = () => {
         }
         const result = await fetchApi('api/startorend',JSON.stringify(param),'POST')
         if(result.code==200){
-            const result = await fetchApi('api/productlist')
+            const result = await fetchProductlist()
             setData(result.data)
         }
     }
@@ -137,7 +141,7 @@ const PageContext: React.FC = () => {
         const param = {id}
         const result = await fetchApi('api/delete',JSON.stringify(param),'POST')
         if(result.code==200){
-            const res= await fetchApi('api/productlist')
+            const res= await fetchProductlist()
             setData(res.data)
             message.info(result.msg)
         }
@@ -148,7 +152,7 @@ const PageContext: React.FC = () => {
             const d = data.filter((item:DataType)=>item.name.includes(str))
             setData(d)
         }else{
-            const res= await fetchApi('api/productlist')
+            const res= await fetchProductlist()
             setData(res.data)
         }
     }

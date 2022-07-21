@@ -41,19 +41,21 @@ const useAccount = (props: FormData) => {
         })
     }
 
-    const setLoading = () => {
+    const setLoading = (value: boolean) => {
         setAccount({
             ...formData,
-            loading: true,
+            loading: value,
         })
     }
 
     const onSubmit = async () => {
-        setLoading()
+        setLoading(true)
         const result = await fetchApi('api/users/login', JSON.stringify(formData.account), 'POST')
         if (result.code == 200) {
             Auth.setAuth(result.data)
-            window.location.href = '#/root/rkconfig'
+            setTimeout(() => (window.location.href = '#/root/rkconfig'))
+        } else {
+            setLoading(false)
         }
         // let history = useHistory()
         // history.push('/root/page-sub1')

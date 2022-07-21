@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import { Panel } from '@/components/Panel'
 import Icon, { PlusOutlined } from '@ant-design/icons';
-
+import { Auth } from '@/auth'
 import fetchAPI from "@/ajax"
 import generator  from 'generate-password';
 
@@ -270,6 +270,9 @@ export default class Index extends React.Component {
     }
 
     render() {
+        if(!Auth.loginInfo.roles.includes("ADMIN")){
+            return (<div>功能尚未完善</div>)
+        }
         const {employeeList,isShowModel,
             addEmployeeName,addRoles,
             userno,
