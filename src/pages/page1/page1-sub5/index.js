@@ -270,7 +270,8 @@ export default class Index extends React.Component {
     }
 
     render() {
-        if(!Auth.loginInfo.roles.includes("ADMIN")){
+        const loginInfo = window.localStorage.getItem('xx-auth-key')?JSON.parse(window.localStorage.getItem('xx-auth-key')):null
+        if(!loginInfo || !loginInfo.roles.includes("ADMIN")){
             return (<div>功能尚未完善</div>)
         }
         const {employeeList,isShowModel,

@@ -22,10 +22,12 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const [confirmNewPassword, setConfirmNewPassword] = React.useState('')
     const { routes } = routeProps
     React.useEffect(() => {
-        if (!Auth.authContent) {
+        if (!localStorage.getItem('xx-auth-key')) {
             window.location.href = '#/login'
+        } else {
+            window.location.href = '#/root/rkconfig'
         }
-    })
+    }, [])
     const NavMenu = (nav: IMenuNav) => {
         return (
             <Menu.Item key={nav.uri}>
