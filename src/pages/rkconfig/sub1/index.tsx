@@ -108,6 +108,11 @@ const PageContext: React.FC = () => {
             key: 'store_house',
         },
         {
+            title: '名字',
+            dataIndex: 'username',
+            key: 'username',
+        },
+        {
             title: '收货地址',
             dataIndex: 'delivery_address',
             key: 'delivery_address',

@@ -1,8 +1,12 @@
 const AUTH_KEY = 'xx-auth-key'
-
+interface auth {
+    id: string
+    roles: string
+}
 export const Auth = {
-    setAuth: (auth: string) => {
+    setAuth: (auth: auth) => {
         window.localStorage.setItem(AUTH_KEY, JSON.stringify(auth))
+        Auth.loginInfo = auth
     },
 
     cleanAuth: () => {
@@ -11,5 +15,5 @@ export const Auth = {
     },
     loginInfo: window.localStorage.getItem(AUTH_KEY)
         ? JSON.parse(window.localStorage.getItem(AUTH_KEY) as string)
-        : null,
+        : { id: '', roles: '' },
 }
