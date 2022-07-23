@@ -71,7 +71,7 @@ const PageSub2: React.FC = () => {
         const unit = el['计量单位']
         const ifOpen = el['是否启用']
         const goodsProdAddress = el['产地']
-        const buyDate = el['采购日期']
+        const buyDate = el['采购日期'] ? el['采购日期'].replaceAll('/', '-') : ''
         const buyNumber = el['采购数量']
         const storeHouse = el['仓库']
         const deliveryAddress = el['收货地址']

@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
-import { Button, Space, Table, Popconfirm, message, Input } from 'antd'
+import {
+    Button,
+    Space,
+    Table,
+    Popconfirm,
+    message,
+    Input,
+    DatePicker,
+    Divider,
+    Modal,
+    Row,
+} from 'antd'
 import fetchApi from '@/ajax/index'
 import XLSX from 'xlsx'
 import { Auth } from '@/auth'
+import { Moment } from 'moment'
+import moment from 'moment'
 const { Search } = Input
-
+const { RangePicker } = DatePicker
+type RangeValue = [Moment | null, Moment | null] | null
+import { SearchOutlined, InboxOutlined } from '@ant-design/icons'
 interface DataType {
     key: string
     name: string
@@ -22,9 +37,15 @@ interface DataType {
     delivery_address: string
 }
 /*eslint-disable*/
+const dateFormat = 'YYYY-MM-DD';
 
 const PageContext: React.FC = () => {
     const [data, setData]= useState([])
+    const [value, setValue] = useState<RangeValue>(null);
+    const [searchName, setSearchName]= useState<string|undefined>(undefined);
+    const [isShowModel, setIsShowModel]= useState(false)
+    const [productName, setProductName] = useState('')
+    const [modelType, setModelType] = useState('')
     useEffect(() => {
         inputHander()
     }, [])
@@ -38,7 +59,21 @@ const PageContext: React.FC = () => {
         XLSX.writeFile(content, `export.xlsx`)
     }
     const print=()=>{
-
+        // format('YYYY/MM/DD 00:00:00')
+        if(value && searchName){
+           const start = moment(value[0]).format('YYYY-MM-DD')
+           const end = moment(value[1]).format('YYYY-MM-DD')
+           const d = data.filter((item:DataType)=>moment(item.buy_date).isBetween(start, end) && item.name==searchName)
+           setData(d)
+        }else if(searchName && !value){
+            const d = data.filter((item:DataType)=>item.name==searchName)
+            setData(d)
+        }else if(!searchName && value){
+            const start = moment(value[0]).format('YYYY-MM-DD')
+            const end = moment(value[1]).format('YYYY-MM-DD')
+            const d = data.filter((item:DataType)=>moment(item.buy_date).isBetween(start, end))
+            setData(d)
+        }
     }
     const fetchProductlist = async ()=>{
         const result = await fetchApi('api/productlist', JSON.stringify(Auth.loginInfo),'POST')
@@ -118,14 +153,17 @@ const PageContext: React.FC = () => {
             key: 'delivery_address',
         },
         {
-            title: 'Action',
+            title: '操作',
             key: 'action',
             render: (_: any, record: any) => (
               <Space size="middle">
                 <a onClick={()=>handleClick(record.id, record.ifopen)}>{record.ifopen==1?"停用":"启用"}</a>
+                {/* <Divider type="vertical"/> */}
                 <Popconfirm title="确定删除?" onConfirm={() => handleDelete(record.id)}>
                    <a>删除</a>
                 </Popconfirm>
+                {/* <Divider type="vertical"/> */}
+                <a onClick={()=>toEdit(record)}>编辑</a>
               </Space>
             ),
         },
@@ -151,38 +189,118 @@ const PageContext: React.FC = () => {
             message.info(result.msg)
         }
     }
-    const onSearch = async (value: string) =>{
-        const str=value.trim()
-        if(str){
-            const d = data.filter((item:DataType)=>item.name.includes(str))
-            setData(d)
-        }else{
-            const res= await fetchProductlist()
-            setData(res.data)
-        }
+    const showAllProductlist = async () =>{
+        const res= await fetchProductlist()
+        setData(res.data)
+        setValue(null)
+        setSearchName(undefined)
     }
+    
+    const submitModel=()=>{
 
+    }
+    const toEdit = (record: DataType)=>{
+        const {model_type,name} = record
+        setIsShowModel(true)
+        setModelType(model_type)
+        setProductName(name)
+    }
     return (
         <Panel>
-            <Button
-                onClick={exportExcel}
-                style={{ marginLeft: 15 }}
-                type="primary"
-                disabled={data.length==0}
-            >
-                导出为excel文件
-            </Button>
-            <Button
-                onClick={print}
-                style={{ marginLeft: 15, marginRight: 300 }}
-                type="primary"
-                disabled={data.length==0}
-            >
-                打印报表
-            </Button>
-            <Search placeholder="请输入..." onSearch={onSearch} style={{ width: 200 }} />
-
+            <div>
+                <Button
+                    onClick={exportExcel}
+                    style={{ marginLeft: 15,marginRight: 30 }}
+                    type="primary"
+                    disabled={data.length==0}
+                >
+                    导出为excel文件
+                </Button>
+                <Input placeholder="请输入姓名" value={searchName} onChange={e=> setSearchName(e.target.value)} style={{width: 160, marginRight: 30}}/>
+                {/* <Search placeholder="请输入..." onSearch={onSearch} style={{ width: 200, marginRight: 30 }} /> */}
+                <RangePicker
+                    format={dateFormat}
+                    value={value}
+                    onChange={val => setValue(val)}
+                />
+                <Button
+                    onClick={print}
+                    style={{ marginLeft: 15, marginRight: 15 }}
+                    type="primary"
+                    icon={<SearchOutlined />}
+                    disabled={data.length==0}
+                >
+                    搜索
+                </Button>
+                <Button type="text" onClick={showAllProductlist} style={{float:'right',color:'#1890ff'}}>
+                    显示全部
+                </Button>
+            </div>
             <Table  bordered  style={{marginTop: 10}}columns={columns} dataSource={data} id='report-table'/>;
+            <Modal
+                title="修改密码"
+                wrapClassName="vertical-center-modal"
+                width="600px"
+                visible={isShowModel}
+                onCancel={() => setIsShowModel(false)}
+                footer={[
+                    <Button key="close" onClick={() => setIsShowModel(false)}>
+                        关闭
+                    </Button>,
+                    <Button
+                        key="submit"
+                        type="primary"
+                        // disabled={
+                        //     originPassword == '' || newPassword == '' || confirmNewPassword == ''
+                        // }
+                        onClick={submitModel}
+                    >
+                        确定
+                    </Button>,
+                ]}
+            >
+                <Row>
+                    <span
+                        style={{
+                            width: 100,
+                            display: 'inline-block',
+                            textAlign: 'right',
+                        }}
+                    >
+                        商品名称:
+                    </span>
+                    <Input
+                        placeholder="请输入商品名称"
+                        onChange={e => {
+                            setProductName(e.target.value)
+                        }}
+                        value={productName}
+                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                    ></Input>
+                </Row>
+                <Row>
+                    <span
+                        style={{
+                            width: 100,
+                            display: 'inline-block',
+                            textAlign: 'right',
+                        }}
+                    >
+                        型号:
+                    </span>
+                    <Input
+                        placeholder="请输入型号"
+                        onChange={e => {
+                            setModelType(e.target.value)
+                        }}
+                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                        value={modelType}
+                    ></Input>
+                </Row>
+                <Row>
+
+                </Row>
+            </Modal>
         </Panel>
     )
 }

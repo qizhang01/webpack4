@@ -97,7 +97,7 @@ const PageSub: React.FC = () => {
             setIfOpen(false)
         }
     }
-    const dateFormat = 'yyyy-MM-DD hh:mm:ss'
+    const dateFormat = 'yyyy-MM-DD'
     const onChangeTime = () => {}
     return (
         <Panel>
