@@ -13,6 +13,12 @@ export const routes: RouteInterface[] = [
         name: 'login',
     },
     {
+        path: '/testing',
+        component: loadable(() => import('@/pages/testing')),
+        exact: true,
+        name: 'testing',
+    },
+    {
         path: RouteUri.Layout,
         component: loadable(() => import('@/pages/layout')),
         name: 'layout',

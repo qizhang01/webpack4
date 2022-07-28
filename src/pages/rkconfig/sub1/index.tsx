@@ -22,7 +22,7 @@ const { RangePicker } = DatePicker
 type RangeValue = [Moment | null, Moment | null] | null
 import { SearchOutlined, InboxOutlined } from '@ant-design/icons'
 interface DataType {
-    key: string
+    id: string
     name: string
     goods_type: string
     goods_no: string
@@ -35,17 +35,21 @@ interface DataType {
     buyNumber: number
     store_house: string
     delivery_address: string
+    username: string
 }
 /*eslint-disable*/
 const dateFormat = 'YYYY-MM-DD';
-
+let recordRow: DataType
+let tableOrginData: DataType[]
 const PageContext: React.FC = () => {
-    const [data, setData]= useState([])
+    const [data, setData]= useState<DataType[]>([])
     const [value, setValue] = useState<RangeValue>(null);
     const [searchName, setSearchName]= useState<string|undefined>(undefined);
     const [isShowModel, setIsShowModel]= useState(false)
     const [productName, setProductName] = useState('')
     const [modelType, setModelType] = useState('')
+    // let recordRow: DataType
+    // let tableOrginData: DataType[]
     useEffect(() => {
         inputHander()
     }, [])
@@ -60,23 +64,27 @@ const PageContext: React.FC = () => {
     }
     const print=()=>{
         // format('YYYY/MM/DD 00:00:00')
+        
         if(value && searchName){
            const start = moment(value[0]).format('YYYY-MM-DD')
            const end = moment(value[1]).format('YYYY-MM-DD')
-           const d = data.filter((item:DataType)=>moment(item.buy_date).isBetween(start, end) && item.name==searchName)
+           const d = tableOrginData.filter((item:DataType)=>moment(item.buy_date.replace(/\//g, "-")).isBetween(start, end) && item.username==searchName)
            setData(d)
         }else if(searchName && !value){
-            const d = data.filter((item:DataType)=>item.name==searchName)
+            const d = tableOrginData.filter((item:DataType)=>item.username==searchName)
             setData(d)
         }else if(!searchName && value){
             const start = moment(value[0]).format('YYYY-MM-DD')
             const end = moment(value[1]).format('YYYY-MM-DD')
-            const d = data.filter((item:DataType)=>moment(item.buy_date).isBetween(start, end))
+            const d = tableOrginData.filter((item:DataType)=>moment(item.buy_date.replace(/\//g, "-")).isBetween(start, end))
             setData(d)
+        }else{
+            setData(tableOrginData)
         }
     }
     const fetchProductlist = async ()=>{
         const result = await fetchApi('api/productlist', JSON.stringify(Auth.loginInfo),'POST')
+        tableOrginData = result.data
         return result
     }
     const columns = [
@@ -180,7 +188,6 @@ const PageContext: React.FC = () => {
         }
     }
     const handleDelete=async (id:string)=>{
-        console.log(id)
         const param = {id}
         const result = await fetchApi('api/delete',JSON.stringify(param),'POST')
         if(result.code==200){
@@ -196,10 +203,25 @@ const PageContext: React.FC = () => {
         setSearchName(undefined)
     }
     
-    const submitModel=()=>{
-
+    const submitModel=async ()=>{
+        if(recordRow.name!==productName || recordRow.model_type!==modelType){
+           //调用更新接口updateProduction
+            const param={
+                productName,
+                modelType,
+                id: recordRow.id
+            }
+            const result = await fetchApi('api/updateProduction',JSON.stringify(param),'POST')
+            if(result.code==200){
+                const res= await fetchProductlist()
+                setData(res.data)
+                message.info(result.msg)
+            }
+        }
     }
+
     const toEdit = (record: DataType)=>{
+        recordRow = record
         const {model_type,name} = record
         setIsShowModel(true)
         setModelType(model_type)
@@ -228,7 +250,6 @@ const PageContext: React.FC = () => {
                     style={{ marginLeft: 15, marginRight: 15 }}
                     type="primary"
                     icon={<SearchOutlined />}
-                    disabled={data.length==0}
                 >
                     搜索
                 </Button>

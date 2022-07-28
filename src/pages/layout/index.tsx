@@ -8,7 +8,7 @@ import { Auth } from '@/auth'
 import { routeProps } from '@/types/route'
 import './index.less'
 import { RouteUri } from '@/router/config'
-import { UserOutlined, EditOutlined, LogoutOutlined } from '@ant-design/icons'
+import { UserOutlined, EditOutlined, LogoutOutlined, ZhihuOutlined } from '@ant-design/icons'
 const { Sider, Header, Content } = Layout
 const SubMenu = Menu.SubMenu
 import fetchAPI from '@/ajax/index'
@@ -49,7 +49,9 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const logout = () => {
         Auth.cleanAuth()
     }
-
+    const toTest = () => {
+        window.location.href = '#/testing'
+    }
     const submitModel = async () => {
         if (newPassword != confirmNewPassword) {
             setWarningText('新密码两次输入不相同,请重新输入')
@@ -83,6 +85,15 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                         >
                             <EditOutlined style={{ marginRight: 10 }} />
                             修改密码
+                        </p>
+                    ),
+                },
+                {
+                    key: '2',
+                    label: (
+                        <p onClick={toTest} className="vatar-dropdown">
+                            <ZhihuOutlined style={{ marginRight: 10 }} />
+                            试题测验
                         </p>
                     ),
                 },
