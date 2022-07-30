@@ -19,8 +19,8 @@ type FormData = {
     loading: boolean
 }
 const list = [
-    { topic: '你的家乡在哪里呢？', selectItem: ['长沙', '重庆', '武汉', '北京'] },
-    { topic: '你的爱好有哪些呢？', selectItem: ['游戏', '打架', '下棋', '读书'] },
+    { topic: '你的家乡在哪里呢？', selectItem: ['长沙', '重庆', '武汉', '北京'], selected: '' },
+    { topic: '你的爱好有哪些呢？', selectItem: ['游戏', '打架', '下棋', '读书'], selected: '' },
     {
         topic: '如何去实现自己的梦想和理想？',
         selectItem: [
@@ -29,6 +29,7 @@ const list = [
             '人生苦短我选躺平',
             '天生我才必有用，过完一天是一天',
         ],
+        selected: '',
     },
 ]
 const useAccount = (props: FormData) => {
@@ -97,7 +98,7 @@ const Testing: React.FC = () => {
 
     // 相当于 componentDidMount 和 componentDidUpdate:
     React.useEffect(() => {}, [])
-    const handleOnChange = (e: RadioChangeEvent) => {
+    const handleOnChange = (e: RadioChangeEvent, topicIndex: number) => {
         console.log(e.target.value)
     }
 
@@ -137,7 +138,7 @@ const Testing: React.FC = () => {
                 <Testingcontent
                     key={topicIndex}
                     topic={list[topicIndex - 1].topic}
-                    onChange={handleOnChange}
+                    onChange={(e: RadioChangeEvent) => handleOnChange(e, topicIndex)}
                     selectItem={list[topicIndex - 1].selectItem}
                 ></Testingcontent>
                 <div className="navigation">

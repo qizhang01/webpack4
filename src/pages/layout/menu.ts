@@ -18,6 +18,10 @@ export const menuNav: IMenuNav[] = [
                 title: 'excel导入',
                 uri: RouteUri.PageSub2,
             },
+            {
+                title: '试题录入',
+                uri: '/root/sub1',
+            },
         ],
     },
 
