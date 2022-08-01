@@ -1,0 +1,60 @@
+CREATE TABLE `productlist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(63) NOT NULL COMMENT '商品名称',
+  `goods_type` varchar(63) DEFAULT NULL COMMENT '商品类型',
+  `goods_no` varchar(30) NOT NULL COMMENT '商品编号',
+   `model_type` varchar(30) DEFAULT NULL COMMENT '规格型号',
+  `price` double(11, 2) NOT NULL COMMENT '价格',
+  `unit` varchar(10) DEFAULT NULL COMMENT '计量单位',
+  `ifopen` int(6) DEFAULT 1 COMMENT '是否启用',
+  `goods_prod_address` varchar(63) DEFAULT NULL COMMENT '商品产地',
+  `buy_date` varchar(30) DEFAULT NULL COMMENT '购买日期',
+  `buy_number` int(11) DEFAULT 0 COMMENT '购买数量',
+  `store_house` varchar(40) DEFAULT NULL COMMENT '仓库地址',
+  `delivery_address` varchar(63) DEFAULT NULL COMMENT '收获地址',
+  `ifdelete` int(6) DEFAULT 0 COMMENT '是否已经删除 0代表未删除',
+   `userno` varchar(30) NOT NULL  COMMENT  '用户名id'
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='商品统计表';
+
+CREATE TABLE `authlist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userno` varchar(63) NOT NULL COMMENT '工号',
+  `name` varchar(63) NOT NULL COMMENT '用户名',
+  `password` varchar(63) NOT NULL COMMENT '密码',
+  `roles` varchar(63) NOT NULL COMMENT '权限',
+  `lastlogintime` varchar(63)  DEFAULT NULL COMMENT '最后登录时间',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+ `ifopen` int(2)  DEFAULT 1 COMMENT '是否启用',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户控制表';
+
+
+CREATE TABLE `testinglib1` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(63) DEFAULT NULL COMMENT '试题库名称',
+  `topic` varchar(1024) NOT NULL COMMENT '试题题目',
+  `A` varchar(1024) NOT NULL COMMENT '试题选项',
+  `B` varchar(1024) NOT NULL COMMENT '试题选项',
+  `C` varchar(1024) NOT NULL COMMENT '试题选项',
+  `D` varchar(1024) NOT NULL COMMENT '试题选项',
+  `E` varchar(1024) NOT NULL COMMENT '试题选项',
+  `F` varchar(1024) NOT NULL COMMENT '试题选项',
+  `G` varchar(1024) NOT NULL COMMENT '试题选项',
+  `oneSelect` int(2) DEFAULT 1 COMMENT '是否单选',
+   `answer` varchar(10) NOT NULL COMMENT '正确答案',
+   `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='试题库名称';
+
+
+CREATE TABLE `testinglibname` (
+  `id` int(1) NOT NULL AUTO_INCREMENT,
+  `name` varchar(512) NOT NULL COMMENT '试题库名称',
+  `tablename` varchar(512) NOT NULL COMMENT '试题库表名称',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='试题库名称表';
+
+
+INSERT INTO testinglibname(name, tablename) VALUES("商品型号知识,生产工艺", "testinglib1,testinglib2");

@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { Input, Layout } from 'antd'
+import { Input, Button, Select } from 'antd'
 import { Auth } from '@/auth'
 import { useHistory } from 'react-router-dom'
 import fetchApi from '@/ajax/index'
@@ -7,7 +7,7 @@ import './index.less'
 import { Testingcontent } from '@/components/Testingcontent'
 import { DoubleLeftOutlined, DoubleRightOutlined } from '@ant-design/icons'
 import { RadioChangeEvent } from 'antd'
-
+const { Option } = Select
 type Account = {
     username: string
     password: string
@@ -17,6 +17,8 @@ type Account = {
 type FormData = {
     account: Account
     loading: boolean
+    hasLogin: boolean
+    
 }
 const list = [
     { topic: '你的家乡在哪里呢？', selectItem: ['长沙', '重庆', '武汉', '北京'], selected: '' },
@@ -36,6 +38,7 @@ const useAccount = (props: FormData) => {
     const [formData, setAccount] = React.useState<FormData>({
         account: props.account,
         loading: props.loading,
+        hasLogin: false,
     })
     const setUsername = (e: any) => {
         setAccount({
@@ -73,12 +76,22 @@ const useAccount = (props: FormData) => {
             },
         })
     }
+
+    const setHasLogin = (flag: boolean) => {
+        setAccount({
+            ...formData,
+            hasLogin: flag,
+        })
+    }
+
+    const setOptions = () => {}
+
     const onSubmit = async () => {
         setLoading(true)
         const result = await fetchApi('api/users/login', JSON.stringify(formData.account), 'POST')
         if (result.code == 200) {
-            Auth.setAuth(result.data)
-            setTimeout(() => (window.location.href = '#/root/rkconfig'))
+            setHasLogin(true)
+            localStorage.setItem('testing-auth-key', JSON.stringify(result.data))
         } else {
             setLoading(false)
             setErrMsg(result.msg)
@@ -93,13 +106,14 @@ const Testing: React.FC = () => {
     const { formData, setAccount } = useAccount({
         account: { username: '', password: '', errMsg: '' },
         loading: false,
+        hasLogin: false,
     })
     const [topicIndex, setTopicIndex] = React.useState(1)
-
     // 相当于 componentDidMount 和 componentDidUpdate:
-    React.useEffect(() => {}, [])
+    // React.useEffect(() => {}, [])
     const handleOnChange = (e: RadioChangeEvent, topicIndex: number) => {
         console.log(e.target.value)
+        list[topicIndex - 1].selected = e.target.value
     }
 
     const handleClickBefore = () => {
@@ -110,54 +124,78 @@ const Testing: React.FC = () => {
         const value = topicIndex + 1
         setTopicIndex(value)
     }
+
+    const handleChange = (value: string) => {}
     return (
         <section className="login-wrapper">
-            {/* <div className="login-content">
-                <aside>
-                    <div />
-                </aside>
+            {!formData.hasLogin && (
+                <div className="login-content">
+                    <aside>
+                        <div />
+                    </aside>
 
-                <section>
-                    <Input
-                        bordered={false}
-                        placeholder="请输入用户名"
-                        onChange={setAccount.setUsername}
-                    />
-                    <Input
-                        bordered={false}
-                        placeholder="请输入密码"
-                        onChange={setAccount.setPassword}
-                    />
-                    <Button block={true} loading={formData.loading} onClick={setAccount.onSubmit}>
-                        开始测验
-                    </Button>
-                </section>
-            </div> */}
-            <div className="testing-content">
-                第{topicIndex}题
-                <Testingcontent
-                    key={topicIndex}
-                    topic={list[topicIndex - 1].topic}
-                    onChange={(e: RadioChangeEvent) => handleOnChange(e, topicIndex)}
-                    selectItem={list[topicIndex - 1].selectItem}
-                ></Testingcontent>
-                <div className="navigation">
-                    <DoubleLeftOutlined
-                        style={{
-                            fontSize: '200%',
-                            visibility: topicIndex == 1 ? 'hidden' : 'visible',
-                        }}
-                        onClick={handleClickBefore}
-                    />
-                    <DoubleRightOutlined
-                        style={{
-                            fontSize: '200%',
-                            visibility: topicIndex == list.length ? 'hidden' : 'visible',
-                        }}
-                        onClick={handleClickAfer}
-                    />
+                    <section>
+                        <Input
+                            bordered={false}
+                            placeholder="请输入用户名"
+                            onChange={setAccount.setUsername}
+                        />
+                        <Input
+                            bordered={false}
+                            placeholder="请输入密码"
+                            onChange={setAccount.setPassword}
+                        />
+                        <Button
+                            block={true}
+                            loading={formData.loading}
+                            onClick={setAccount.onSubmit}
+                        >
+                            开始测验
+                        </Button>
+                    </section>
                 </div>
-            </div>
+            )}
+            {formData.hasLogin && (
+                <>
+                    <div>
+                        <Select
+                            placeholder="请选择试题类型"
+                            style={{ width: 250 }}
+                            onChange={handleChange}
+                        >
+                            <Option value="jack">Jack</Option>
+                            <Option value="lucy">Lucy</Option>
+                            <Option value="Yiminghe">yiminghe</Option>
+                        </Select>
+                    </div>
+                    <div className="testing-content">
+                        第{topicIndex}题
+                        <Testingcontent
+                            key={topicIndex}
+                            value={list[topicIndex - 1].selected}
+                            topic={list[topicIndex - 1].topic}
+                            onChange={(e: RadioChangeEvent) => handleOnChange(e, topicIndex)}
+                            selectItem={list[topicIndex - 1].selectItem}
+                        ></Testingcontent>
+                        <div className="navigation">
+                            <DoubleLeftOutlined
+                                style={{
+                                    fontSize: '200%',
+                                    visibility: topicIndex == 1 ? 'hidden' : 'visible',
+                                }}
+                                onClick={handleClickBefore}
+                            />
+                            <DoubleRightOutlined
+                                style={{
+                                    fontSize: '200%',
+                                    visibility: topicIndex == list.length ? 'hidden' : 'visible',
+                                }}
+                                onClick={handleClickAfer}
+                            />
+                        </div>
+                    </div>
+                </>
+            )}
         </section>
     )
 }

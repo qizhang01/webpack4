@@ -7,11 +7,11 @@ import {
     Switch,
     Radio,
     Button,
-    Upload,
     Checkbox,
     Modal,
-    Row,
+    message,
     Col,
+    Tag,
     Card,
 } from 'antd'
 const { TextArea } = Input
@@ -22,6 +22,7 @@ import './index.less'
 import moment from 'moment'
 import { Auth } from '@/auth'
 import fetchApi from '@/ajax/index'
+import { CustomTagProps } from 'rc-select/lib/BaseSelect'
 
 const { Option } = Select
 
@@ -34,12 +35,15 @@ const stl = {
     topic: { marginRight: '10px', fontWeight: 800 },
 }
 const InputNumberStl = { width: '60%' }
+const options = [{ value: 'A' }, { value: 'B' }, { value: 'C' }, { value: 'D' }]
 
 const PageSub: React.FC = () => {
     const param = useLocation()
 
     const [isShowModel, setIsShowModel] = useState(false)
     const [activeTabKey1, setActiveTabKey1] = useState<string>('testinglib1')
+    const [alltopics, setAllTopics] = useState<string[]>([])
+
     const tabList = [
         {
             key: 'testinglib1',
@@ -50,16 +54,59 @@ const PageSub: React.FC = () => {
             tab: '试题2',
         },
     ]
+    React.useEffect(() => {
+        getAllTopics()
+    }, [activeTabKey1])
+
+    const getAllTopics = async () => {
+        const result = await fetchApi(
+            'api/testing/alltopics',
+            JSON.stringify({ tablename: activeTabKey1 }),
+            'POST'
+        )
+        setAllTopics(result.data)
+    }
+    const renderTopicCard = () => {
+        return alltopics.map((item: any, index) => {
+            return (
+                <Card
+                    type="inner"
+                    title={`第${index + 1}题`}
+                    key={index}
+                    extra={<a href="#">删除</a>}
+                >
+                    {item.topic}
+                </Card>
+            )
+        })
+    }
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values)
-        const { topic, item1, item2, item3, item4, answer } = values
-        // const result = await fetchApi('api/addOneProduct', JSON.stringify(body), 'POST')
-        // console.log(result)
-        // if (result.code == '200') {
-        //     message.info('提交成功')
-        // } else {
-        //     message.info('提交失败, 请重新提交')
-        // }
+        const { topic, A, B, C = '', D = '', E = '', F = '', G = '', answer } = values
+        const obj: any = {
+            A,
+            B,
+            C,
+            D,
+            E,
+            F,
+            G,
+        }
+
+        const body = {
+            name: activeTabKey1,
+            topic,
+            oneSelect: answer.length == 1 ? 1 : 0,
+            answer: answer.join(','),
+            ...obj,
+        }
+        const result = await fetchApi('api/testing/importonetopic', JSON.stringify(body), 'POST')
+        console.log(result)
+        if (result.code == '200') {
+            message.info('提交成功')
+        } else {
+            message.info('提交失败, 请重新提交')
+        }
     }
     const onTab1Change = (key: string) => {
         setActiveTabKey1(key)
@@ -70,6 +117,25 @@ const PageSub: React.FC = () => {
         setIsShowModel(true)
     }
     const onChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {}
+
+    const tagRender = (props: CustomTagProps) => {
+        const { label, closable, onClose } = props
+        const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+        return (
+            <Tag
+                color="gold"
+                onMouseDown={onPreventMouseDown}
+                closable={closable}
+                onClose={onClose}
+                style={{ marginRight: 10 }}
+            >
+                <span style={{ marginRight: 6 }}>{label}</span>
+            </Tag>
+        )
+    }
     return (
         <Panel>
             <Card
@@ -86,10 +152,12 @@ const PageSub: React.FC = () => {
                     onTab1Change(key)
                 }}
             >
+                {renderTopicCard()}
                 <span
                     style={{
-                        width: 160,
-                        height: 140,
+                        width: 120,
+                        height: 100,
+                        marginTop: 10,
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -114,23 +182,23 @@ const PageSub: React.FC = () => {
                         <TextArea showCount style={{ height: 80 }} onChange={onChangeTextArea} />
                     </Form.Item>
                     <Form.Item
-                        name="item1"
-                        label="选项1"
+                        name="A"
+                        label="A"
                         rules={[{ required: true, message: '必须输入选项' }]}
                     >
                         <Input placeholder="请输入选项1" />
                     </Form.Item>
                     <Form.Item
-                        name="item2"
-                        label="选项2"
+                        name="B"
+                        label="B"
                         rules={[{ required: true, message: '必须输入选项' }]}
                     >
                         <Input placeholder="请输入选项2" />
                     </Form.Item>
-                    <Form.Item name="item3" label="选项3">
+                    <Form.Item name="C" label="C">
                         <Input placeholder="请输入选项3" />
                     </Form.Item>
-                    <Form.Item name="item4" label="选项4">
+                    <Form.Item name="D" label="D">
                         <Input placeholder="请输入选项4" />
                     </Form.Item>
                     <Form.Item
@@ -138,7 +206,14 @@ const PageSub: React.FC = () => {
                         name="answer"
                         rules={[{ required: true, message: '必须输入正确答案' }]}
                     >
-                        <InputNumber min={1} placeholder="请输入正确答案" style={InputNumberStl} />
+                        <Select
+                            mode="multiple"
+                            showArrow
+                            tagRender={tagRender}
+                            style={{ width: '100%' }}
+                            options={options}
+                        />
+                        {/* <InputNumber min={1} placeholder="请输入正确答案" style={InputNumberStl} /> */}
                     </Form.Item>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
                         <Button type="primary" htmlType="submit" block style={{ width: '40%' }}>
