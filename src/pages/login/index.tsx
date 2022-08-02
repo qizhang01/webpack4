@@ -63,7 +63,11 @@ const useAccount = (props: FormData) => {
         const result = await fetchApi('api/users/login', JSON.stringify(formData.account), 'POST')
         if (result.code == 200) {
             Auth.setAuth(result.data)
-            setTimeout(() => (window.location.href = '#/root/rkconfig'))
+            if (result.data.roles.includes('ADMIN') || result.data.roles.includes('USER')) {
+                setTimeout(() => (window.location.href = '#/root/rkconfig'))
+            } else {
+                setErrMsg('你的账号没有登录权限')
+            }
         } else {
             setLoading(false)
             setErrMsg(result.msg)
