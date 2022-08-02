@@ -111,7 +111,10 @@ const PageSub: React.FC = () => {
     const onTab1Change = (key: string) => {
         setActiveTabKey1(key)
     }
-    const submitModel = () => {}
+    const closeModel = () => {
+        getAllTopics()
+        setIsShowModel(false)
+    }
     const addTablist = () => {}
     const handlePlusIcon = () => {
         setIsShowModel(true)
@@ -174,7 +177,7 @@ const PageSub: React.FC = () => {
                 wrapClassName="vertical-center-modal"
                 width="600px"
                 visible={isShowModel}
-                onCancel={() => setIsShowModel(false)}
+                onCancel={closeModel}
                 footer={null}
             >
                 <Form name="config-form" {...formItemLayout} onFinish={onFinish} initialValues={{}}>

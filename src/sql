@@ -29,6 +29,7 @@ CREATE TABLE `authlist` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户控制表';
 
+ALTER TABLE `authlist` add score varchar(256) DEFAULT NULL COMMENT '测试成绩' AFTER roles;
 
 CREATE TABLE `testinglib1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
