@@ -26,11 +26,13 @@ export const Testingcontent: React.FC<Itype> = (props: Itype) => {
             <div style={{ marginBottom: 6 }}>{props.topic}</div>
             <Radio.Group onChange={onChange} value={value}>
                 <Space direction="vertical">
-                    {props.selectItem.map((item, index) => (
-                        <Radio key={index} style={{ margin: 4, color: 'white' }} value={index}>
-                            {item}
-                        </Radio>
-                    ))}
+                    {props.selectItem.map((item, index) =>
+                        item ? (
+                            <Radio key={index} style={{ margin: 4, color: 'white' }} value={index}>
+                                {item}
+                            </Radio>
+                        ) : null
+                    )}
                 </Space>
             </Radio.Group>
         </div>
