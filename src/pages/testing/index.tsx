@@ -47,8 +47,12 @@ type ListType = {
 //         selected: '',
 //     },
 // ]
-
+type LoginInfo = {
+    id: number
+    roles: string
+}
 let tablename = ''
+let loginInfo: LoginInfo
 const useAccount = (props: FormData) => {
     const [formData, setAccount] = React.useState<FormData>({
         account: props.account,
@@ -104,6 +108,7 @@ const useAccount = (props: FormData) => {
         const result = await fetchApi('api/users/login', JSON.stringify(formData.account), 'POST')
         if (result.code == 200) {
             setHasLogin(true)
+            loginInfo = result.data
             localStorage.setItem('testing-auth-key', JSON.stringify(result.data))
         } else {
             setLoading(false)
@@ -115,7 +120,7 @@ const useAccount = (props: FormData) => {
 }
 type LastResult = {
     totalNumber: number
-    errNumber: number
+    rightNumber: number
     selectedArr: SingleResult[]
 }
 type SingleResult = {
@@ -140,7 +145,7 @@ const Testing: React.FC = () => {
     const [isShowSubject, setIsShowSubject] = React.useState(false)
     const [lastResut, setLastResult] = React.useState<LastResult>({
         totalNumber: 0,
-        errNumber: 0,
+        rightNumber: 0,
         selectedArr: [],
     })
 
@@ -205,36 +210,37 @@ const Testing: React.FC = () => {
         map.set(4, 'E')
         map.set(5, 'F')
         map.set(6, 'G')
-
+        const selectedArr: string[] = list.map(item => map.get(item.selected))
         const result = await fetchApi(
-            'api/testing/alltopics',
-            JSON.stringify({ tablename, answer: true }),
+            'api/testing/submittestingresult',
+            JSON.stringify({
+                tablename,
+                selectedArr,
+                id: loginInfo.id,
+            }),
             'POST'
         )
-        const res = result.data
-        console.log('33333333333333333', res)
-        const selectedArr: string[] = list.map(item => map.get(item.selected))
-        let errNumber = 0,
-            tempObj: any[] = []
-        for (let i = 0; i < selectedArr.length; i++) {
-            if (selectedArr[i] !== res[i].answer) {
-                errNumber++
-                tempObj.push({
-                    value: selectedArr[i],
-                    isTrue: false,
-                })
-            } else {
-                tempObj.push({
-                    value: selectedArr[i],
-                    isTrue: true,
-                })
-            }
-        }
-        console.log()
+
+        // let errNumber = 0,
+        //     tempObj: any[] = []
+        // for (let i = 0; i < selectedArr.length; i++) {
+        //     if (selectedArr[i] !== res[i].answer) {
+        //         errNumber++
+        //         tempObj.push({
+        //             value: selectedArr[i],
+        //             isTrue: false,
+        //         })
+        //     } else {
+        //         tempObj.push({
+        //             value: selectedArr[i],
+        //             isTrue: true,
+        //         })
+        //     }
+        // }
         setLastResult({
             totalNumber: selectedArr.length,
-            errNumber,
-            selectedArr: tempObj,
+            rightNumber: result.data.rightNumber,
+            selectedArr: result.data.tempObj,
         })
         setIsShowLastScore(true)
     }
@@ -339,11 +345,7 @@ const Testing: React.FC = () => {
                 <div className="testing-content">
                     <div style={{ textAlign: 'center', marginTop: 80, marginBottom: 30 }}>
                         <Avatar size={100} style={{ color: '#1890ff', backgroundColor: '#fde3cf' }}>
-                            <span style={{ fontSize: 36 }}>
-                                {((lastResut.totalNumber - lastResut.errNumber) * 100) /
-                                    lastResut.totalNumber}
-                                分
-                            </span>
+                            <span style={{ fontSize: 36 }}>{lastResut.rightNumber}分</span>
                         </Avatar>
                     </div>
                     <div style={{ textAlign: 'center' }}>
@@ -354,13 +356,13 @@ const Testing: React.FC = () => {
                                 </span>
                             ))}
                         </div>
-                        本次测验正确的题数是
+                        本次测验的题数是
                         <span style={{ color: '#1890ff', fontSize: 18, margin: '0 6px' }}>
                             {lastResut.totalNumber}
                         </span>
-                        道, 错误的题数是
+                        道, 正确的题数是
                         <span style={{ color: '#1890ff', fontSize: 18, margin: '0 6px' }}>
-                            {lastResut.errNumber}
+                            {lastResut.rightNumber}
                         </span>
                         道
                     </div>
