@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const InterpolateHtmlPlugin = require('interpolate-html-plugin');
+// const InterpolateHtmlPlugin = require('interpolate-html-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -144,7 +144,7 @@ module.exports = merge(webpackConfig, {
 
         // 在html模板中能够使用环境变量
         // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
-        new InterpolateHtmlPlugin({ PUBLIC_URL: "/" }),
+        // new InterpolateHtmlPlugin({ PUBLIC_URL: "/" }),
         // 在js代码中能够使用环境变量(demo: process.env.NODE_ENV === 'production')
         // new webpack.DefinePlugin(env.stringified),
         // 忽略moment的国际化库

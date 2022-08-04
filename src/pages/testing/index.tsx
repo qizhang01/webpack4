@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react'
 import { Input, Button, Select, Avatar } from 'antd'
 import { Auth } from '@/auth'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import fetchApi from '@/ajax/index'
 import './index.less'
 import { Testingcontent } from '@/components/Testingcontent'
@@ -116,7 +116,7 @@ const useAccount = (props: FormData) => {
         }
     }
 
-    return { formData, setAccount: { setUsername, setPassword, onSubmit } }
+    return { formData, setAccount: { setUsername, setPassword, onSubmit, setHasLogin } }
 }
 type LastResult = {
     totalNumber: number
@@ -141,6 +141,9 @@ const Testing: React.FC = () => {
     // 相当于 componentDidMount 和 componentDidUpdate:
     React.useEffect(() => {
         fetchOptions()
+        if (localStorage.getItem('xx-auth-key') && location.hash.split('?')[1] == 'from=main') {
+            setAccount.setHasLogin(true)
+        }
     }, [])
     const [isShowSubject, setIsShowSubject] = React.useState(false)
     const [lastResut, setLastResult] = React.useState<LastResult>({
@@ -333,10 +336,15 @@ const Testing: React.FC = () => {
                                 ))}
                             </Select>
                             <div>
-                                <Button type="primary" style={{ width: 250 }} onClick={toStart}>
+                                <Button
+                                    type="primary"
+                                    style={{ width: 250, marginBottom: 10 }}
+                                    onClick={toStart}
+                                >
                                     开始测验
                                 </Button>
                             </div>
+                            <a href="javascript:;">点击查看历史记录</a>
                         </div>
                     )}
                 </div>

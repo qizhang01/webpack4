@@ -49,8 +49,10 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const logout = () => {
         Auth.cleanAuth()
     }
-    const toTest = () => {
-        window.location.href = '#/testing'
+    const toTest = async () => {
+        const cache = localStorage.getItem('xx-auth-key') || ''
+        localStorage.setItem('testing-auth-key', cache)
+        window.location.href = '#/testing?from=main'
     }
     const submitModel = async () => {
         if (newPassword != confirmNewPassword) {
@@ -98,7 +100,7 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                     ),
                 },
                 {
-                    key: '2',
+                    key: '3',
                     label: (
                         <p onClick={logout} className="vatar-dropdown">
                             <LogoutOutlined style={{ marginRight: 10 }} />
