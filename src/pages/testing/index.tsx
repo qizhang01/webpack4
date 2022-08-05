@@ -151,7 +151,7 @@ const Testing: React.FC = () => {
         rightNumber: 0,
         selectedArr: [],
     })
-
+    const [historyList, setHistoryList] = React.useState([])
     const handleOnChange = (e: RadioChangeEvent, topicIndex: number) => {
         console.log(e.target.value)
         list[topicIndex - 1].selected = e.target.value
@@ -203,7 +203,24 @@ const Testing: React.FC = () => {
     const toStart = () => {
         list.length > 0 && setIsShowSubject(true)
     }
-
+    const historyScore = async () => {
+        // alltestingscore
+        const { id } = JSON.parse(localStorage.getItem('testing-auth-key') || '')
+        const result = await fetchApi('api/users/alltestingscore', JSON.stringify({ id }), 'POST')
+        const d = result.data[0].score.split('&')
+        const map = new Map()
+        options.forEach(item => {
+            map.set(item.tablename, item.option)
+        })
+        const list = d.map((item: any) => {
+            const tempArr = item.split('=')
+            return {
+                option: map.get(tempArr[0]),
+                score: tempArr[1],
+            }
+        })
+        setHistoryList(list)
+    }
     const finished = async () => {
         const map = new Map()
         map.set(0, 'A')
@@ -344,7 +361,20 @@ const Testing: React.FC = () => {
                                     开始测验
                                 </Button>
                             </div>
-                            <a href="javascript:;">点击查看历史记录</a>
+
+                            <a
+                                href="javascript:;"
+                                onClick={historyScore}
+                                style={{ display: 'block', marginBottom: 10 }}
+                            >
+                                点击查看历史记录
+                            </a>
+
+                            {historyList.map((item: any, index) => (
+                                <span key={index}>
+                                    {item.option} 上次测验分数为：{item.score}
+                                </span>
+                            ))}
                         </div>
                     )}
                 </div>
