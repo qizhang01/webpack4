@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
 import XLSX from 'xlsx'
 import fetchApi from '@/ajax/index'
-import { message, Modal, Table } from 'antd'
+import { message, Input, Table, Button } from 'antd'
 import { Auth } from '@/auth'
-import Icon, { PlusOutlined } from '@ant-design/icons'
+import Icon, { PlusOutlined,SearchOutlined } from '@ant-design/icons'
 import { ColumnsType } from 'antd/es/table'
 
 const columns = [
@@ -45,10 +45,11 @@ const columns = [
         render: (_, record) => <a>{record.createtime.slice(0, 10)}</a>,
     },
 ]
-
+const tableOrginData=[]
 const PageSub2= () => {
     const [dataSource, setDataSource] = useState([])
     const loginInfo = JSON.parse(localStorage.getItem('xx-auth-key') || '')
+    const [searchName, setSearchName] = useState(undefined)
     useEffect(() => {
         if(document.getElementById('import')){           
             document.getElementById('import').addEventListener('change', e => {
@@ -64,6 +65,7 @@ const PageSub2= () => {
         const result = await fetchApi('api/getstandard')
         if (result.code == 200) {
             setDataSource(result.data)
+            tableOrginData = result.data
         }
     }
     const inputHander = (e) => {
@@ -134,6 +136,14 @@ const PageSub2= () => {
             goodsNorms,
         }
     }
+    const search =()=>{
+        if(searchName){
+            const d = tableOrginData.filter(item=>item.name.includes(searchName))
+            setDataSource(d)
+        }else{
+            setDataSource(tableOrginData)
+        }
+    }
     return (loginInfo.roles.includes('ADMIN') ? 
         <Panel>
             <label
@@ -142,11 +152,20 @@ const PageSub2= () => {
                     width: '160px',
                     marginBottom: 6,
                     marginLeft: 6,
+                    marginRight: 60
                 }}
             >
                 <PlusOutlined /> 导入excel文件
                 <input id="import" type="file" style={{ display: 'none' }} />
             </label>
+            <Input placeholder="请输入商品名称" value={searchName} onChange={e=> setSearchName(e.target.value)} style={{width: 160, marginRight: 20}}/>
+            <Button
+                    onClick={search}
+                    type="primary"
+                    icon={<SearchOutlined />}
+                >
+                    搜索
+            </Button>
             <Table dataSource={dataSource} columns={columns} size='small'/>;
         </Panel>: 
         <div>功能尚未完善</div>
