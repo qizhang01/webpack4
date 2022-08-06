@@ -4,6 +4,10 @@ import XLSX from 'xlsx'
 import fetchApi from '@/ajax/index'
 import { message, Modal } from 'antd'
 import { Auth } from '@/auth'
+
+let errorLineList: number[] = []
+let map = new Map()
+
 const PageSub2: React.FC = () => {
     useEffect(() => {
         document.getElementById('import')!.addEventListener('change', e => {
@@ -12,6 +16,14 @@ const PageSub2: React.FC = () => {
         return document.getElementById('import')!.removeEventListener('change', inputHander)
     }, [])
 
+    const getStandard = async () => {
+        const result = await fetchApi('api/getstandard')
+        if (result.code == 200) {
+            result.data.forEach((element: any) => {
+                map.set(element.goodsno, element.name)
+            })
+        }
+    }
     const inputHander = (e: any) => {
         let data,
             workbook,
@@ -43,10 +55,20 @@ const PageSub2: React.FC = () => {
                     // break; // 如果只取第一张表，就取消注释这行
                 }
             }
+            if (map.size == 0) {
+                await getStandard()
+            }
             //循环生成qrcode并自动下载到文件夹
             items.map((el, index) => {
                 excelData.push(getExelArray(el, index))
             })
+            if (errorLineList.length > 0) {
+                return message.info(
+                    `第${errorLineList.join(
+                        ','
+                    )}行数据异常, 名称,编号或者价格不能为空,或者商品名称和编号不匹配。`
+                )
+            }
             const userno = Auth.loginInfo.id
             const result = await fetchApi(
                 'api/addExcelImportProduct',
@@ -65,7 +87,7 @@ const PageSub2: React.FC = () => {
     const getExelArray = (el: any, index: number) => {
         const goodsType = el['商品类别']
         const goodsNo = el['商品编号']
-        const name = el['商品名称']
+        const name = el['商品名称'].replace('（', '(').replace('）', ')')
         const modelType = el['规格型号']
         const price = el['采购价']
         const unit = el['计量单位']
@@ -75,9 +97,11 @@ const PageSub2: React.FC = () => {
         const buyNumber = el['采购数量']
         const storeHouse = el['仓库']
         const deliveryAddress = el['收货地址']
-        if (name == '' || goodsNo == '' || !price) {
+        if (name == '' || goodsNo == '' || !price || name !== map.get(goodsNo)) {
+            errorLineList.push(index + 1)
             return message.info(`第${index + 1}行数据异常, 名称,编号或者价格不能为空`)
         }
+
         return {
             goodsType,
             goodsNo,
