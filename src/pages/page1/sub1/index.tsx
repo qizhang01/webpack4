@@ -39,7 +39,7 @@ const options = [{ value: 'A' }, { value: 'B' }, { value: 'C' }, { value: 'D' }]
 
 const PageSub: React.FC = () => {
     const param = useLocation()
-
+    const loginInfo = JSON.parse(localStorage.getItem('xx-auth-key') || '')
     const [isShowModel, setIsShowModel] = useState(false)
     const [activeTabKey1, setActiveTabKey1] = useState<string>('testinglib1')
     const [alltopics, setAllTopics] = useState<string[]>([])
@@ -139,7 +139,7 @@ const PageSub: React.FC = () => {
             </Tag>
         )
     }
-    return (
+    return loginInfo.roles.includes('ADMIN') ? (
         <Panel>
             <Card
                 style={{ width: '100%' }}
@@ -226,6 +226,8 @@ const PageSub: React.FC = () => {
                 </Form>
             </Modal>
         </Panel>
+    ) : (
+        <div>功能尚未完善</div>
     )
 }
 export default PageSub

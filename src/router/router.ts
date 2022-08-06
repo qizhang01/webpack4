@@ -24,10 +24,16 @@ export const routes: RouteInterface[] = [
         name: 'layout',
         routes: [
             {
+                path: '/root/standard',
+                component: loadable(() => import('@/pages/page1/importstandard')),
+                exact: true,
+            },
+            {
                 path: RouteUri.PageSub2,
                 component: loadable(() => import('@/pages/page1/page1-sub2')),
                 exact: true,
             },
+
             {
                 path: RouteUri.PageSub3,
                 component: loadable(() => import('@/pages/page1/page1-sub3')),

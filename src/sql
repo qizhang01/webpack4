@@ -59,3 +59,17 @@ CREATE TABLE `testinglibname` (
 
 
 INSERT INTO testinglibname(name, tablename) VALUES("商品型号知识,生产工艺", "testinglib1,testinglib2");
+            goodsType,
+            goodsCode
+
+CREATE TABLE `standard` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL COMMENT '商品名称',
+  `goodsno` varchar(32) NOT NULL COMMENT '商品编号',
+  `goodstype` varchar(32) DEFAULT NULL COMMENT '商品类型',
+  `goodscode` varchar(32) DEFAULT NULL COMMENT '商品编码',
+  `goodsNorms` varchar(32) NOT NULL COMMENT '商品规格',
+  `userno` varchar(32) NOT NULL COMMENT '录入人编号',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='商品名称对照表';
