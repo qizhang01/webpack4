@@ -68,7 +68,7 @@ CREATE TABLE `standard` (
   `goodsno` varchar(32) NOT NULL COMMENT '商品编号',
   `goodstype` varchar(32) DEFAULT NULL COMMENT '商品类型',
   `goodscode` varchar(32) DEFAULT NULL COMMENT '商品编码',
-  `goodsNorms` varchar(32) NOT NULL COMMENT '商品规格',
+  `goodsnorms` varchar(32) NOT NULL COMMENT '商品规格',
   `userno` varchar(32) NOT NULL COMMENT '录入人编号',
   `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
   PRIMARY KEY (`id`)
