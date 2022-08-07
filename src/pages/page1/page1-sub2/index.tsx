@@ -63,11 +63,12 @@ const PageSub2: React.FC = () => {
                 excelData.push(getExelArray(el, index))
             })
             if (errorLineList.length > 0) {
-                return message.info(
-                    `第${errorLineList.join(
+                return Modal.error({
+                    title: '报错信息',
+                    content: `第${errorLineList.join(
                         ','
-                    )}行数据异常, 名称,编号或者价格不能为空,或者商品名称和编号不匹配。`
-                )
+                    )}行数据异常, 名称,编号或者价格不能为空,或者商品名称和编号不匹配。`,
+                })
             }
             const userno = Auth.loginInfo.id
             const result = await fetchApi(
