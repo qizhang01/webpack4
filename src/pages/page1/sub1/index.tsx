@@ -4,7 +4,7 @@ import {
     Select,
     Input,
     InputNumber,
-    Switch,
+    Popconfirm,
     Radio,
     Button,
     Checkbox,
@@ -94,6 +94,18 @@ const PageSub: React.FC = () => {
         )
         setAllTopics(result.data)
     }
+    const handleDelete = async (id: string) => {
+        console.log(id)
+        const result = await fetchApi(
+            'api/testing/deletetopic',
+            JSON.stringify({ tablename: activeTabKey1, id }),
+            'POST'
+        )
+        if (result.code == 200) {
+            message.info(result.msg)
+            getAllTopics()
+        }
+    }
     const renderTopicCard = () => {
         return alltopics.map((item: any, index) => {
             const tempArr = []
@@ -113,7 +125,11 @@ const PageSub: React.FC = () => {
                     type="inner"
                     title={`第${index + 1}题`}
                     key={index}
-                    extra={<a href="#">删除</a>}
+                    extra={
+                        <Popconfirm title="确定删除?" onConfirm={() => handleDelete(item.id)}>
+                            <a>删除</a>
+                        </Popconfirm>
+                    }
                 >
                     {item.topic}
                     {tempArr.map((el, index) => (
