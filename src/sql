@@ -73,3 +73,63 @@ CREATE TABLE `standard` (
   `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='商品名称对照表';
+
+
+CREATE TABLE `salary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `employeeid` int(11) NOT NULL,
+  `name` varchar(10) NOT NULL COMMENT '员工姓名',
+  `president` varchar(10) DEFAULT NULL COMMENT '员工职位',
+  `salarytpye` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
+  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
+  `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
+  `salarymonth` int(10) DEFAULT NULL COMMENT '当月月薪',
+  `userno` varchar(32) NOT NULL COMMENT '录入人编号',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='薪水表';
+
+CREATE TABLE `salary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `employeeid` int(11) NOT NULL,
+  `name` varchar(10) NOT NULL COMMENT '员工姓名',
+  `president` varchar(10) DEFAULT NULL COMMENT '员工职位',
+  `salarytpye` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
+  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
+  `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
+  `salarymonth` int(10) DEFAULT NULL COMMENT '当月月薪',
+  `salarymonthfull` int(10) DEFAULT NULL COMMENT '满勤月薪',
+  `userno` varchar(32) NOT NULL COMMENT '录入人编号',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='薪水表';
+
+CREATE TABLE `salary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `employeeid` int(11) NOT NULL,
+  `name` varchar(10) NOT NULL COMMENT '员工姓名',
+  `president` varchar(10) DEFAULT NULL COMMENT '员工职位',
+  `salarytpye` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
+  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
+  `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
+  `salarymonth` int(10) DEFAULT NULL COMMENT '当月月薪',
+  `salarymonthfull` int(10) DEFAULT NULL COMMENT '满勤月薪',
+  `userno` varchar(32) NOT NULL COMMENT '录入人编号',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='薪水表';
+
+CREATE TABLE `salary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `employeeid` int(11) NOT NULL,
+  `name` varchar(10) NOT NULL COMMENT '员工姓名',
+  `president` varchar(10) DEFAULT NULL COMMENT '员工职位',
+  `salarytpye` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
+  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
+  `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
+  `salarymonth` int(10) DEFAULT NULL COMMENT '当月月薪',
+  `salarymonthfull` int(10) DEFAULT NULL COMMENT '满勤月薪',
+  `userno` varchar(32) NOT NULL COMMENT '录入人编号',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='薪水表';

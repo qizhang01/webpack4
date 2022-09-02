@@ -55,6 +55,10 @@ export const menuNav: IMenuNav[] = [
                 title: '员工成绩',
                 uri: '/root/score',
             },
+            {
+                title: '员工薪水',
+                uri: '/root/salary',
+            },
         ],
     },
 ]

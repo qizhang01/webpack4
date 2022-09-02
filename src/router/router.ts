@@ -24,6 +24,11 @@ export const routes: RouteInterface[] = [
         name: 'layout',
         routes: [
             {
+                path: '/root/salary',
+                component: loadable(() => import('@/pages/salary')),
+                exact: true,
+            },
+            {
                 path: '/root/score',
                 component: loadable(() => import('@/pages/page1/score')),
                 exact: true,
