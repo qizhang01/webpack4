@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Form, Select, Input, InputNumber, Button, Row, Collapse, message } from 'antd'
+import { Form, Select, Input, InputNumber, Button, Table, Collapse, message } from 'antd'
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons'
 import { Panel } from '@/components/Panel'
 import './index.less'
 import { Auth } from '@/auth'
 import fetchApi from '@/ajax/index'
-
+import XLSX from 'xlsx'
 const { Option } = Select
 
 const formItemLayout = {
@@ -20,7 +20,63 @@ const InputNumberStl = { width: '60%' }
 
 const PageSub: React.FC = () => {
     const [method, setMethod] = useState('日结')
-
+    const [tableData, setTableData] = useState([])
+    const columns = [
+        {
+            title: '结算方式',
+            dataIndex: 'salarytype',
+            key: 'salarytype',
+        },
+        {
+            title: '姓名',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: '员工ID',
+            dataIndex: 'employeeid',
+            key: 'employeeid',
+        },
+        {
+            title: '日薪',
+            dataIndex: 'salaryday',
+            key: 'salaryday',
+        },
+        {
+            title: '上月薪水',
+            dataIndex: 'totalSalary',
+            key: 'totalSalary',
+        },
+        {
+            title: '工龄',
+            dataIndex: 'worklong',
+            key: 'worklong',
+        },
+        /*eslint-disable*/
+        {
+            title: '操作',
+            key: 'action',
+            render: (text: any, record: any) => (
+                <span>
+                    <a href="javascript:;" onClick={() => reset(record)}>
+                        修改
+                    </a>
+                </span>
+            ),
+        },
+        /*eslint-disable*/
+        // {
+        //     title: '姓名',
+        //     dataIndex: 'userno',
+        //     key: 'userno',
+        // },
+        // {
+        //     title: '创建时间',
+        //     dataIndex: 'createtime',
+        //     key: 'createtime',
+        //     render: (_: any, record: any) => <a>{record.createtime.slice(0, 10)}</a>,
+        // },
+    ]
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values)
         let body = {}
@@ -97,7 +153,8 @@ const PageSub: React.FC = () => {
             } = values
             totalSalary =
                 ((workday * factrestdays) / 28).toFixed() +
-                salaryday * (workday + holidays + monthholiday - factrestdays)
+                Number(salaryday * (workday + holidays + monthholiday - factrestdays))
+
             body = {
                 salarytype,
                 name,
@@ -110,8 +167,6 @@ const PageSub: React.FC = () => {
             }
             path = 'savesimplemonth'
         }
-
-        console.log(body)
 
         const result = await fetchApi(`api/salary/${path}`, JSON.stringify(body), 'POST')
         console.log(result)
@@ -126,11 +181,97 @@ const PageSub: React.FC = () => {
         setMethod(value)
     }
 
-    const calSalary = (type: string) => {}
+    const reset = (type: string) => {}
+    const query = async () => {
+        const result = await fetchApi('api/salary/getallemployeesalary')
+        if (result.code == '200') {
+            setTableData(result.data)
+        } else {
+            message.info('查询失败, 请重新提交')
+        }
+    }
+    const onChange = (key: any) => {
+        console.log(key)
+        if (key == 2) {
+            query()
+        }
+    }
+    const inputHander = (e:any) => {
+        let data,
+            workbook,
+            items:any[] = [],
+            excelData: any[]= []
+        const files = e.target.files
+        if (!/\.(xlsx|xls)$/.test(files[0].name)) {
+            return alert('文件类型不正确')
+        }
+        let fileReader = new FileReader()
+
+        // // 以二进制方式打开文件
+        fileReader.readAsBinaryString(files[0])
+
+        fileReader.onload = async function(ev) {
+            try {
+                data = ev.target?.result
+                workbook = XLSX.read(data, {
+                    type: 'binary',
+                }) // 以二进制流方式读取得到整份excel表格对象
+            } catch {
+                return alert('文件有错误，请重新编辑后导入')
+            }
+
+            // // 遍历每张表读取
+            for (let sheet in workbook.Sheets) {
+                if (workbook.Sheets[sheet]) {
+                    items = items.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]))
+                    // break; // 如果只取第一张表，就取消注释这行
+                }
+            }
+            //循环生成qrcode并自动下载到文件夹
+
+            // const result = await fetchApi(
+            //     'api/importstandard',
+            //     JSON.stringify({ excelData, userno }),
+            //     'POST'
+            // )
+            // console.log('22222222222222', result)
+            // if (result.code == '200') {
+            //     message.info('提交成功')
+            // } else {
+            //     message.info('提交失败, 请重新提交')
+            // }
+        }
+    }
+
+    const getExelArray = (el:any, index:number) => {
+        const goodsNo = el['商品编号']
+        const name = el['商品名称'].replace('（', '(').replace('）', ')')
+        const goodsType = el['商品类别']
+        const goodsCode = el['编码']
+        const goodsNorms = el['规格型号']
+        if (name == '' || goodsNo == '') {
+            return message.info(`第${index + 1}行数据异常, 名称,编号或者价格不能为空`)
+        }
+        return {
+            goodsNo,
+            name,
+            goodsType,
+            goodsCode,
+            goodsNorms,
+        }
+    }
+    React.useEffect(() => {
+        if(document.getElementById('import')){           
+            document.getElementById('import')?.addEventListener('change', e => {
+                inputHander(e)
+            })
+            return document.getElementById('import')?.removeEventListener('change', inputHander)
+        }   
+    },[])
 
     return (
         <Panel>
-            <Collapse>
+            <Collapse onChange={onChange} accordion>
                 <Collapse.Panel header="员工薪水录入" key="1">
                     <Form name="config-form" {...formItemLayout} onFinish={onFinish}>
                         <Form.Item name="salarytype" label="核算方式">
@@ -260,7 +401,21 @@ const PageSub: React.FC = () => {
                         </div>
                     </Form>
                 </Collapse.Panel>
-                <Collapse.Panel header="员工薪水列表" key="2"></Collapse.Panel>
+                <Collapse.Panel header="员工薪水列表" key="2">
+                <label
+                className="ant-btn ant-btn-primary"
+                style={{
+                    width: '160px',
+                    marginBottom: 6,
+                    marginLeft: 6,
+                    marginRight: 60
+                }}
+            >
+                <UploadOutlined /> 导入excel文件
+                <input id="import" type="file" style={{ display: 'none' }} />
+            </label>
+                    <Table dataSource={tableData} columns={columns} size="small" />
+                </Collapse.Panel>
             </Collapse>
         </Panel>
     )
