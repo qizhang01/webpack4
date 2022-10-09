@@ -16,7 +16,7 @@ const formItemLayout = {
 const stl = {
     topic: { marginRight: '10px', fontWeight: 800 },
 }
-const InputNumberStl = { width: '60%' }
+const InputNumberStl = { width: '50%' }
 
 const PageSub: React.FC = () => {
     const [method, setMethod] = useState('日结')
@@ -181,7 +181,9 @@ const PageSub: React.FC = () => {
         setMethod(value)
     }
 
-    const reset = (type: string) => {}
+    const reset = (type: string) => {
+
+    }
     const query = async () => {
         const result = await fetchApi('api/salary/getallemployeesalary')
         if (result.code == '200') {
@@ -200,7 +202,8 @@ const PageSub: React.FC = () => {
         let data,
             workbook,
             items:any[] = [],
-            excelData: any[]= []
+            excelData= new Map(),
+            lastJson: any={}
         const files = e.target.files
         if (!/\.(xlsx|xls)$/.test(files[0].name)) {
             return alert('文件类型不正确')
@@ -227,47 +230,67 @@ const PageSub: React.FC = () => {
                     // break; // 如果只取第一张表，就取消注释这行
                 }
             }
-            //循环生成qrcode并自动下载到文件夹
-
-            // const result = await fetchApi(
-            //     'api/importstandard',
-            //     JSON.stringify({ excelData, userno }),
-            //     'POST'
-            // )
-            // console.log('22222222222222', result)
-            // if (result.code == '200') {
-            //     message.info('提交成功')
-            // } else {
-            //     message.info('提交失败, 请重新提交')
-            // }
+            items.map((el, index) => {
+                const obj=getExelArray(el, index)
+                excelData.set(obj.personNo, obj)
+            }) 
+            
+            //遍历所有数据修改本月的工资信息
+            tableData.forEach(item=>{
+                const {employeeid,salarytype ,salaryday, worklong=0, worklongmoney=0}= item
+                if(excelData.has(employeeid)){
+                    const {workday, daytotal, holidays, monthholiday, factrestdays} = excelData.get(employeeid)
+                    let totalSalary:number = 0
+                    if(salarytype=="日结"){
+                        totalSalary = workday * (salaryday + (worklong * worklongmoney) / daytotal)
+                    }else if(salarytype=="无满勤奖励"){
+                        totalSalary = salaryday * (workday + holidays + monthholiday - factrestdays)
+                    }else if(salarytype=="按比例核定"){
+                        totalSalary =
+                        Number(((workday * factrestdays) / 28).toFixed() )+
+                        Number(salaryday * (workday + holidays + monthholiday - factrestdays))
+                    }
+                    lastJson[employeeid] = {totalSalary,salarytype}
+                }
+            })
+            console.log("oooooooooooooooo",lastJson)
+            const result = await fetchApi(
+                'api/salary/updatetotalsalary',
+                JSON.stringify(lastJson),
+                'POST'
+            )
+            if (result.code == '200') {
+                message.info('提交成功')
+            } else {
+                message.info('提交失败, 请重新提交')
+            }
         }
     }
 
     const getExelArray = (el:any, index:number) => {
-        const goodsNo = el['商品编号']
-        const name = el['商品名称'].replace('（', '(').replace('）', ')')
-        const goodsType = el['商品类别']
-        const goodsCode = el['编码']
-        const goodsNorms = el['规格型号']
-        if (name == '' || goodsNo == '') {
-            return message.info(`第${index + 1}行数据异常, 名称,编号或者价格不能为空`)
-        }
+        const personNo = el['员工编号']
+        const workday = el['出勤']
+        const daytotal = el['当月天数']
+        const monthholiday = el['月休息天数']
+        const holidays = el['积累假期']
+        const factrestdays = el['月休天数']
         return {
-            goodsNo,
-            name,
-            goodsType,
-            goodsCode,
-            goodsNorms,
+            personNo,
+            workday,
+            daytotal,
+            monthholiday,
+            holidays,
+            factrestdays,
         }
     }
     React.useEffect(() => {
-        if(document.getElementById('import')){           
-            document.getElementById('import')?.addEventListener('change', e => {
+        if(document.getElementById('importSalary')){           
+            document.getElementById('importSalary')?.addEventListener('change', e => {
                 inputHander(e)
             })
-            return document.getElementById('import')?.removeEventListener('change', inputHander)
+            return document.getElementById('importSalary')?.removeEventListener('change', inputHander)
         }   
-    },[])
+    })
 
     return (
         <Panel>
@@ -277,7 +300,7 @@ const PageSub: React.FC = () => {
                         <Form.Item name="salarytype" label="核算方式">
                             <Select
                                 defaultValue="日结"
-                                style={{ width: 120 }}
+                                style={{ width: 180 }}
                                 onChange={selectMethod}
                             >
                                 <Option value="日结">日结</Option>
@@ -372,7 +395,7 @@ const PageSub: React.FC = () => {
                             }}
                         >
                             <Form.Item name="workday" label="本月出勤">
-                                <InputNumber placeholder="请输入本月出勤天数" />
+                                <InputNumber placeholder="请输入本月出勤天数" style={InputNumberStl}/>
                             </Form.Item>
                             <Form.Item label="积累假期" name="holidays">
                                 <InputNumber
@@ -382,13 +405,13 @@ const PageSub: React.FC = () => {
                                 />
                             </Form.Item>
                             <Form.Item name="monthholiday" label="每月休息天数">
-                                <InputNumber placeholder="请输入月休息天数" />
+                                <InputNumber placeholder="请输入月休息天数" style={InputNumberStl}/>
                             </Form.Item>
                             <Form.Item name="factrestdays" label="实际休息天数">
-                                <InputNumber placeholder="请输入实际休息天数" />
+                                <InputNumber placeholder="请输入实际休息天数" style={InputNumberStl} />
                             </Form.Item>
                             <Form.Item name="salaryday" label="日工资">
-                                <InputNumber placeholder="请输入日工资" />
+                                <InputNumber placeholder="请输入日工资" style={InputNumberStl} />
                             </Form.Item>
                         </div>
 
@@ -403,17 +426,17 @@ const PageSub: React.FC = () => {
                 </Collapse.Panel>
                 <Collapse.Panel header="员工薪水列表" key="2">
                 <label
-                className="ant-btn ant-btn-primary"
-                style={{
-                    width: '160px',
-                    marginBottom: 6,
-                    marginLeft: 6,
-                    marginRight: 60
-                }}
-            >
-                <UploadOutlined /> 导入excel文件
-                <input id="import" type="file" style={{ display: 'none' }} />
-            </label>
+                    className="ant-btn ant-btn-primary"
+                    style={{
+                        width: '160px',
+                        marginBottom: 6,
+                        marginLeft: 6,
+                        marginRight: 60
+                    }}
+                >
+                    <UploadOutlined /> 导入excel文件
+                    <input id="importSalary" type="file" style={{ display: 'none' }} />
+                </label>
                     <Table dataSource={tableData} columns={columns} size="small" />
                 </Collapse.Panel>
             </Collapse>
