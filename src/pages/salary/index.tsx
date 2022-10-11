@@ -1,5 +1,18 @@
 import React, { useState } from 'react'
-import { Form, Select, Input, InputNumber, Button, Table, Collapse, message } from 'antd'
+import {
+    Form,
+    Select,
+    Input,
+    InputNumber,
+    Button,
+    Table,
+    Collapse,
+    message,
+    Divider,
+    Popconfirm,
+    Modal,
+    Row,
+} from 'antd'
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons'
 import { Panel } from '@/components/Panel'
 import './index.less'
@@ -21,6 +34,11 @@ const InputNumberStl = { width: '50%' }
 const PageSub: React.FC = () => {
     const [method, setMethod] = useState('日结')
     const [tableData, setTableData] = useState([])
+    const [isShowModel, setIsShowModel] = React.useState(false)
+    const [salaryday, setSalaryday] = React.useState('')
+    const [worklong, setWorklong] = React.useState('')
+    const [worklongsalary, setWorklongsalary] = React.useState('')
+    let [selectedItem, setSelectedItem] = React.useState({})
     const columns = [
         {
             title: '结算方式',
@@ -59,8 +77,12 @@ const PageSub: React.FC = () => {
             render: (text: any, record: any) => (
                 <span>
                     <a href="javascript:;" onClick={() => reset(record)}>
-                        修改
+                        调薪
                     </a>
+                    <Divider type="vertical"/>
+                    <Popconfirm title="确定删除?" onConfirm={() => handleDelete(record)}>
+                        <a>删除</a>
+                    </Popconfirm>
                 </span>
             ),
         },
@@ -180,10 +202,50 @@ const PageSub: React.FC = () => {
     const selectMethod = (value: string) => {
         setMethod(value)
     }
-
-    const reset = (type: string) => {
-
+    const handleDelete = async (record: any)=>{
+        const {salarytype, name, employeeid}=record
+        const body = {
+            salarytype,
+            employeeid
+        }
+        const result = await fetchApi(`api/salary/delete`, JSON.stringify(body), 'POST')
+        if (result.code == '200') {
+            message.info(`删除成功`)
+            query()
+        } else {
+            message.info('提交失败, 请重新提交')
+        }
     }
+    
+    const submitModel = async () => {
+        const body = {
+            ...selectedItem,
+            salaryday,
+            worklong,
+            worklongsalary
+        }
+        console.log(selectedItem)
+        const result = await fetchApi(`api/salary/update`, JSON.stringify(body), 'POST')
+        if (result.code == '200') {
+            message.info(`提交成功`)
+        } else {
+            message.info('提交失败, 请重新提交')
+        }
+    }
+
+    const reset=(record:any)=>{
+        setIsShowModel(true)
+        const {salarytype, name, employeeid,  salaryday, worklong=0, worklongmoney=0}=record
+        setSelectedItem({
+            salarytype,
+            name,
+            employeeid,
+            salaryday,
+            worklong,
+            worklongmoney
+        })
+    }
+    
     const query = async () => {
         const result = await fetchApi('api/salary/getallemployeesalary')
         if (result.code == '200') {
@@ -438,6 +500,89 @@ const PageSub: React.FC = () => {
                     <input id="importSalary" type="file" style={{ display: 'none' }} />
                 </label>
                     <Table dataSource={tableData} columns={columns} size="small" />
+                    <Modal
+                        title="修改薪水"
+                        wrapClassName="vertical-center-modal"
+                        width="600px"
+                        visible={isShowModel}
+                        onCancel={() => setIsShowModel(false)}
+                        footer={[
+                            <Button key="close" onClick={() => setIsShowModel(false)}>
+                                关闭
+                            </Button>,
+                            <Button
+                                key="submit"
+                                type="primary"
+                                disabled={
+                                    salaryday == ''
+                                }
+                                onClick={submitModel}
+                            >
+                                确定
+                            </Button>,
+                        ]}
+                    >
+                        <Row>
+                            <span
+                                style={{
+                                    width: 100,
+                                    display: 'inline-block',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                日薪:
+                            </span>
+                            <InputNumber
+                                placeholder="请输入日薪"
+                                onChange={value=> {
+                                    setSalaryday(value)
+                                }}
+                                style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                                value={salaryday}
+                            ></InputNumber>
+                        </Row>
+                        <Row>
+                            <span
+                                style={{
+                                    width: 100,
+                                    display: 'inline-block',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                工龄:
+                            </span>
+                            <InputNumber
+                                placeholder="请输入工龄"
+                                onChange={value => {
+                                    setWorklong(value)
+                                }}
+                                style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                                value={worklong}
+                            ></InputNumber>
+                        </Row>
+                        <Row>
+                            <span
+                                style={{
+                                    width: 100,
+                                    display: 'inline-block',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                工龄薪水:
+                            </span>
+                            <InputNumber
+                                placeholder="请输入工龄薪水"
+                                onChange={value => {
+                                    setWorklongsalary(value)
+                                }}
+                                style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                                value={worklongsalary}
+                            ></InputNumber>
+                        </Row>
+                        <Row>
+
+                        </Row>
+                    </Modal>
                 </Collapse.Panel>
             </Collapse>
         </Panel>
