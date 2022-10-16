@@ -82,6 +82,7 @@ CREATE TABLE `salary_day` (
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
+  `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
   `worklong` int(6) DEFAULT NULL COMMENT '工龄年限',
   `worklongmoney` int(6) DEFAULT NULL COMMENT '工龄月薪',
   `totalSalary` int(10) DEFAULT NULL COMMENT '当月月薪',
@@ -90,7 +91,6 @@ CREATE TABLE `salary_day` (
   UNIQUE (`employeeid`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='日薪结算薪水表';
-
 
 CREATE TABLE `salary_month` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -101,6 +101,7 @@ CREATE TABLE `salary_month` (
   `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
+  `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
   `totalSalary` int(10) DEFAULT NULL COMMENT '当月月薪',
   `monthholiday` int(2) DEFAULT NULL COMMENT '月假期天数',
   `userno` varchar(32) NOT NULL COMMENT '录入人编号',
@@ -108,3 +109,7 @@ CREATE TABLE `salary_month` (
   UNIQUE (`employeeid`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='月薪无满勤薪水表';
+
+
+ALTER TABLE `salary_month` ADD COLUMN `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资' AFTER `salaryday`;
+ALTER TABLE `salary_day` ADD COLUMN `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资' AFTER `salaryday`;
