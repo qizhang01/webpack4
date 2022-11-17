@@ -117,8 +117,10 @@ const PageSub: React.FC = () => {
                 employeeid,
                 salaryworkovertime,
                 salaryday,
-                worklong,
-                worklongmoney,
+                worklong=0,
+                worklongmoney=0,
+                salarymiddleworkday,
+                salarynightworkday
             } = values
             body = {
                 salarytype,
@@ -128,6 +130,8 @@ const PageSub: React.FC = () => {
                 salaryday,
                 worklong,
                 worklongmoney,
+                salarymiddleworkday,
+                salarynightworkday,
                 totalSalary,
                 userno: Auth.loginInfo.id,
             }
@@ -150,12 +154,16 @@ const PageSub: React.FC = () => {
                 employeeid,
                 salaryworkovertime,
                 salaryday,
+                salarymiddleworkday,
+                salarynightworkday
             } = values
             body = {
                 salarytype,
                 name,
                 employeeid,
                 salaryworkovertime,
+                salarymiddleworkday,
+                salarynightworkday,
                 salaryday,
                 userno: Auth.loginInfo.id,
             }
@@ -166,12 +174,16 @@ const PageSub: React.FC = () => {
                 employeeid,
                 salaryworkovertime,
                 salaryday,
+                salarymiddleworkday,
+                salarynightworkday,
             } = values
             body = {
                 salarytype,
                 name,
                 employeeid,
                 salaryworkovertime,
+                salarymiddleworkday,
+                salarynightworkday,
                 salaryday,
                 userno: Auth.loginInfo.id,
             }
@@ -290,18 +302,20 @@ const PageSub: React.FC = () => {
             
             //遍历所有数据修改本月的工资信息
             tableData.forEach(item=>{
-                const {employeeid,salarytype ,salaryday, worklong=0, worklongmoney=0, salaryworkovertime=0}= item
+                const {employeeid,salarytype ,salaryday, worklong=0, worklongmoney=0, salaryworkovertime=0, salarymiddleworkday=0,
+                    salarynightworkday=0}= item
                 if(excelData.has(employeeid)){
-                    const {workday, daytotal, holidays=0, monthholiday=0, factrestdays=0, overtimehours=0} = excelData.get(employeeid)
+                    const {workday, daytotal, holidays=0, monthholiday=0, factrestdays=0, overtimehours=0, 
+                        nightworkday=0, middleworkday=0} = excelData.get(employeeid)
                     let totalSalary:number = 0
                     if(salarytype=="日结"){
-                        totalSalary = workday * (salaryday + (worklong * worklongmoney) / daytotal) + overtimehours*salaryworkovertime
+                        totalSalary = workday * (salaryday + (worklong * worklongmoney) / daytotal) + overtimehours*salaryworkovertime + middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
                     }else if(salarytype=="无满勤奖励"){
-                        totalSalary = salaryday * (workday + holidays + monthholiday - factrestdays) + overtimehours*salaryworkovertime
+                        totalSalary = salaryday * (workday + holidays + monthholiday - factrestdays) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
                     }else if(salarytype=="按比例核定"){
                         totalSalary =
                         Number(((workday * factrestdays) / 28).toFixed() )+
-                        Number(salaryday * (workday + holidays + monthholiday - factrestdays)) + overtimehours*salaryworkovertime
+                        Number(salaryday * (workday + holidays + monthholiday - factrestdays)) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
                     }
                     lastJson[employeeid] = {totalSalary,salarytype}
                 }
@@ -313,10 +327,8 @@ const PageSub: React.FC = () => {
                 'POST'
             )
             if (result.code == '200') {
-                message.info('提交成功')
+                // message.info('提交成功')
                 query()
-            } else {
-                message.info('提交失败, 请重新提交')
             }
         }
     }
@@ -329,6 +341,8 @@ const PageSub: React.FC = () => {
         const holidays = el['积累假期']
         const factrestdays = el['月休天数']
         const overtimehours = el['加班时长']
+        const middleworkday = el['中班天数']
+        const nightworkday = el['晚班天数']
         return {
             personNo,
             workday,
@@ -337,6 +351,8 @@ const PageSub: React.FC = () => {
             holidays,
             factrestdays,
             overtimehours,
+            middleworkday,
+            nightworkday
         }
     }
     React.useEffect(() => {
@@ -383,8 +399,14 @@ const PageSub: React.FC = () => {
                         <Form.Item name="salaryday" label="日工资" rules={[{ required: true, message: '必须输入日工资' }]}>
                                 <InputNumber placeholder="请输入日工资" style={InputNumberStl} />
                         </Form.Item>
-                        <Form.Item name="salaryworkovertime" label="加班工资" rules={[{ required: true, message: '必须输入加班工资' }]}>
+                        <Form.Item name="salaryworkovertime" label="加班时薪" rules={[{ required: true, message: '必须输入加班工资' }]}>
                                 <InputNumber placeholder="加班时薪" style={InputNumberStl} />
+                        </Form.Item>
+                        <Form.Item name="salarymiddleworkday" label="中班工资" rules={[{ required: true, message: '必须输入中班工资' }]}>
+                                <InputNumber placeholder="请输入中班工资" style={InputNumberStl} />
+                        </Form.Item>
+                        <Form.Item name="salarynightworkday" label="晚班工资" rules={[{ required: true, message: '必须输入晚班工资' }]}>
+                                <InputNumber placeholder="请输入晚班工资" style={InputNumberStl} />
                         </Form.Item>
                         <div style={{ display: method == '日结' ? 'block' : 'none' }}>
                             <Form.Item name="worklong" label="工龄">

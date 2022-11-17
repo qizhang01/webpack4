@@ -83,6 +83,8 @@ CREATE TABLE `salary_day` (
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
+  `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '每天中班工资',
+  `salarynightworkday` int(3) DEFAULT NULL COMMENT '每天晚班工资',
   `worklong` int(6) DEFAULT NULL COMMENT '工龄年限',
   `worklongmoney` int(6) DEFAULT NULL COMMENT '工龄月薪',
   `totalSalary` int(10) DEFAULT NULL COMMENT '当月月薪',
@@ -102,6 +104,8 @@ CREATE TABLE `salary_month` (
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
+  `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '每天中班工资',
+  `salarynightworkday` int(3) DEFAULT NULL COMMENT '每天晚班工资',
   `totalSalary` int(10) DEFAULT NULL COMMENT '当月月薪',
   `monthholiday` int(2) DEFAULT NULL COMMENT '月假期天数',
   `userno` varchar(32) NOT NULL COMMENT '录入人编号',
@@ -111,5 +115,7 @@ CREATE TABLE `salary_month` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='月薪无满勤薪水表';
 
 
-ALTER TABLE `salary_month` ADD COLUMN `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资' AFTER `salaryday`;
-ALTER TABLE `salary_day` ADD COLUMN `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资' AFTER `salaryday`;
+ALTER TABLE `salary_month` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
+ALTER TABLE `salary_day` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
+ALTER TABLE `salary_month` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
+ALTER TABLE `salary_day` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
