@@ -2,13 +2,14 @@ import * as React from 'react'
 import { withRouter, Link, useHistory } from 'react-router-dom'
 import { Layout, Menu, Button, Dropdown, Avatar, Modal, Row, Input } from 'antd'
 import { RenderRoutes } from '@/router/RenderRoutes'
-import { IMenuNav, menuNav } from '@/pages/layout/menu'
+import { IMenuNav, menuNav, permission } from '@/pages/layout/menu'
 import Logo from '@/assets/images/logo.jpg'
 import { Auth } from '@/auth'
 import { routeProps } from '@/types/route'
 import './index.less'
 import { RouteUri } from '@/router/config'
 import { UserOutlined, EditOutlined, LogoutOutlined, ZhihuOutlined } from '@ant-design/icons'
+
 const { Sider, Header, Content } = Layout
 const SubMenu = Menu.SubMenu
 import fetchAPI from '@/ajax/index'
@@ -21,6 +22,14 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const [newPassword, setNewPassword] = React.useState('')
     const [confirmNewPassword, setConfirmNewPassword] = React.useState('')
     const { routes } = routeProps
+    const info = JSON.parse(window.localStorage.getItem('xx-auth-key') as string).roles.includes(
+        'ADMIN'
+    )
+    let navItem = [...menuNav]
+    if (info) {
+        navItem.push(permission)
+    }
+
     React.useEffect(() => {
         if (!localStorage.getItem('xx-auth-key')) {
             window.location.href = '#/login'
@@ -136,7 +145,7 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
                         theme="dark"
                         multiple={false}
                     >
-                        {menuNav.map((nav: IMenuNav) => {
+                        {navItem.map((nav: IMenuNav) => {
                             if (nav.children) {
                                 return NavSubMenu(nav)
                             } else {

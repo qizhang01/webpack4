@@ -33,32 +33,31 @@ export const menuNav: IMenuNav[] = [
         show: true,
         uri: RouteUri.echart,
     },
-    {
-        title: '权限',
-        show: localStorage.getItem('xx-auth-key')
-            ? JSON.parse(localStorage.getItem('xx-auth-key') || '').roles.includes('ADMIN')
-            : false,
-        children: [
-            {
-                title: '权限控制',
-                uri: RouteUri.PageSub5,
-            },
-            {
-                title: '试题录入',
-                uri: '/root/sub1',
-            },
-            {
-                title: '标准导入',
-                uri: '/root/standard',
-            },
-            {
-                title: '员工成绩',
-                uri: '/root/score',
-            },
-            {
-                title: '员工薪水',
-                uri: '/root/salary',
-            },
-        ],
-    },
 ]
+
+export const permission = {
+    title: '权限',
+    show: true,
+    children: [
+        {
+            title: '权限控制',
+            uri: RouteUri.PageSub5,
+        },
+        {
+            title: '试题录入',
+            uri: '/root/sub1',
+        },
+        {
+            title: '标准导入',
+            uri: '/root/standard',
+        },
+        {
+            title: '员工成绩',
+            uri: '/root/score',
+        },
+        {
+            title: '员工薪水',
+            uri: '/root/salary',
+        },
+    ],
+}
