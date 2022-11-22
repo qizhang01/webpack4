@@ -22,9 +22,9 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const [newPassword, setNewPassword] = React.useState('')
     const [confirmNewPassword, setConfirmNewPassword] = React.useState('')
     const { routes } = routeProps
-    const info = JSON.parse(window.localStorage.getItem('xx-auth-key') as string).roles.includes(
-        'ADMIN'
-    )
+    const info =
+        window.localStorage.getItem('xx-auth-key') &&
+        JSON.parse(window.localStorage.getItem('xx-auth-key') as string).roles.includes('ADMIN')
     let navItem = [...menuNav]
     if (info) {
         navItem.push(permission)
