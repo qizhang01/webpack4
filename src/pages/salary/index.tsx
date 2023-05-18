@@ -40,6 +40,7 @@ const PageSub: React.FC = () => {
     const [worklongsalary, setWorklongsalary] = React.useState('')
     let [selectedItem, setSelectedItem] = React.useState({})
     const [salaryworkovertime, setSalaryworkovertime] = React.useState('')
+    const [salaryLabel, setSalaryLabel] = React.useState('日薪')
     const columns = [
         {
             title: '结算方式',
@@ -57,14 +58,33 @@ const PageSub: React.FC = () => {
             key: 'employeeid',
         },
         {
-            title: '日薪',
+            title: '日薪/月薪',
             dataIndex: 'salaryday',
             key: 'salaryday',
+            render(text: string, record: any) {
+                return (
+                    <span>
+                        <a href="javascript:;">
+                            {record.salarytype !== '日结' ? `${text}(月薪)` : text}
+                        </a>
+                    </span>
+                )
+            },
         },
         {
             title: '加班时薪',
             dataIndex: 'salaryworkovertime',
             key: 'salaryworkovertime',
+        },
+        {
+            title: '中班补贴',
+            dataIndex: 'salarymiddleworkday',
+            key: 'salarymiddleworkday',
+        },
+        {
+            title: '晚班补贴',
+            dataIndex: 'salarynightworkday',
+            key: 'salarynightworkday',
         },
         {
             title: '上月薪水',
@@ -136,18 +156,6 @@ const PageSub: React.FC = () => {
                 userno: Auth.loginInfo.id,
             }
             path = 'savesimpleday'
-        } else if (salarytype === '月结') {
-            const {
-                name,
-                employeeid,
-                workday,
-                daytotal,
-                fullsalary,
-                salaryday,
-                overdaysalary,
-                factrestdays,
-            } = values
-            path = 'savesimpleday'
         } else if (salarytype === '无满勤奖励') {
             const {
                 name,
@@ -201,6 +209,11 @@ const PageSub: React.FC = () => {
 
     const selectMethod = (value: string) => {
         setMethod(value)
+        if(value=="日结"){
+            setSalaryLabel("日薪")
+        }else{
+            setSalaryLabel("月薪")
+        }
     }
     const handleDelete = async (record: any)=>{
         const {salarytype, name, employeeid}=record
@@ -238,6 +251,11 @@ const PageSub: React.FC = () => {
     const reset=(record:any)=>{
         setIsShowModel(true)
         const {salarytype, name, employeeid,  salaryday, worklong=0, worklongmoney=0, salaryworkovertime}=record
+        if(salarytype=="日结"){
+            setSalaryLabel("日薪")
+        }else{
+            setSalaryLabel("月薪")
+        }
         setSelectedItem({
             salarytype,
             name,
@@ -310,12 +328,8 @@ const PageSub: React.FC = () => {
                     let totalSalary:number = 0
                     if(salarytype=="日结"){
                         totalSalary = workday * (salaryday + (worklong * worklongmoney) / daytotal) + overtimehours*salaryworkovertime + middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
-                    }else if(salarytype=="无满勤奖励"){
-                        totalSalary = salaryday * (workday + holidays + monthholiday - factrestdays) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
-                    }else if(salarytype=="按比例核定"){
-                        totalSalary =
-                        Number(((workday * factrestdays) / 28).toFixed() )+
-                        Number(salaryday * (workday + holidays + monthholiday - factrestdays)) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
+                    }else{
+                        totalSalary = Number(salaryday * workday/30 ) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
                     }
                     lastJson[employeeid] = {totalSalary,salarytype}
                 }
@@ -396,8 +410,8 @@ const PageSub: React.FC = () => {
                         >
                             <Input placeholder="请输入员工id" />
                         </Form.Item>
-                        <Form.Item name="salaryday" label="日工资" rules={[{ required: true, message: '必须输入日工资' }]}>
-                                <InputNumber placeholder="请输入日工资" style={InputNumberStl} />
+                        <Form.Item name="salaryday" label={salaryLabel} rules={[{ required: true, message: '必须输入日/月工资' }]}>
+                                <InputNumber placeholder={`请输入${salaryLabel}`} style={InputNumberStl} />
                         </Form.Item>
                         <Form.Item name="salaryworkovertime" label="加班时薪" rules={[{ required: true, message: '必须输入加班工资' }]}>
                                 <InputNumber placeholder="加班时薪" style={InputNumberStl} />
@@ -508,10 +522,10 @@ const PageSub: React.FC = () => {
                                     textAlign: 'right',
                                 }}
                             >
-                                日薪:
+                                {salaryLabel}:
                             </span>
                             <InputNumber
-                                placeholder="请输入日薪"
+                                placeholder={`请输入${salaryLabel}`}
                                 onChange={value=> {
                                     setSalaryday(value)
                                 }}
