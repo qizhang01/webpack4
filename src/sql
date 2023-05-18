@@ -13,7 +13,7 @@ CREATE TABLE `productlist` (
   `store_house` varchar(40) DEFAULT NULL COMMENT '仓库地址',
   `delivery_address` varchar(63) DEFAULT NULL COMMENT '收获地址',
   `ifdelete` int(6) DEFAULT 0 COMMENT '是否已经删除 0代表未删除',
-   `userno` varchar(30) NOT NULL  COMMENT  '用户名id'
+   `userno` varchar(30) NOT NULL  COMMENT  '用户名id',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='商品统计表';
 
@@ -32,6 +32,23 @@ CREATE TABLE `authlist` (
 ALTER TABLE `authlist` add score varchar(256) DEFAULT NULL COMMENT '测试成绩' AFTER roles;
 
 CREATE TABLE `testinglib1` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(63) DEFAULT NULL COMMENT '试题库名称',
+  `topic` varchar(1024) NOT NULL COMMENT '试题题目',
+  `A` varchar(1024) NOT NULL COMMENT '试题选项',
+  `B` varchar(1024) NOT NULL COMMENT '试题选项',
+  `C` varchar(1024) NOT NULL COMMENT '试题选项',
+  `D` varchar(1024) NOT NULL COMMENT '试题选项',
+  `E` varchar(1024) NOT NULL COMMENT '试题选项',
+  `F` varchar(1024) NOT NULL COMMENT '试题选项',
+  `G` varchar(1024) NOT NULL COMMENT '试题选项',
+  `oneSelect` int(2) DEFAULT 1 COMMENT '是否单选',
+   `answer` varchar(10) NOT NULL COMMENT '正确答案',
+   `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='试题库名称';
+
+CREATE TABLE `testinglib2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(63) DEFAULT NULL COMMENT '试题库名称',
   `topic` varchar(1024) NOT NULL COMMENT '试题题目',
@@ -77,7 +94,7 @@ CREATE TABLE `standard` (
 
 CREATE TABLE `salary_day` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `employeeid` int(11) NOT NULL,
+  `employeeid` varchar(11) NOT NULL,
   `name` varchar(10) NOT NULL COMMENT '员工姓名',
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
@@ -96,7 +113,7 @@ CREATE TABLE `salary_day` (
 
 CREATE TABLE `salary_month` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `employeeid` int(11) NOT NULL,
+  `employeeid` varchar(11) NOT NULL,
   `name` varchar(10) NOT NULL COMMENT '员工姓名',
   `president` varchar(10) DEFAULT NULL COMMENT '员工职位',
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
@@ -119,3 +136,7 @@ ALTER TABLE `salary_month` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL 
 ALTER TABLE `salary_day` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
 ALTER TABLE `salary_month` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
 ALTER TABLE `salary_day` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
+
+
+
+INSERT into authlist value (null,'0000','admin','123456','ADMIN',null,null,1) 
