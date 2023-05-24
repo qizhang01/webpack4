@@ -19,7 +19,6 @@ import './index.less'
 import { Auth } from '@/auth'
 import fetchApi from '@/ajax/index'
 import XLSX from 'xlsx'
-import { AnyARecord } from 'dns'
 const { Option } = Select
 
 const formItemLayout = {
@@ -33,8 +32,10 @@ const stl = {
 const InputNumberStl = { width: '50%' }
 
 const PageSub: React.FC = () => {
+    const emptylist: any[] = []
+    const [totalTableData, setTotalTableData] = React.useState([])
     const [method, setMethod] = useState('日结')
-    const [tableData, setTableData] = useState([])
+    const [tableData, setTableData] = useState(emptylist)
     const [isShowModel, setIsShowModel] = React.useState(false)
     const [salaryday, setSalaryday] = React.useState('')
     const [worklong, setWorklong] = React.useState('')
@@ -58,6 +59,9 @@ const PageSub: React.FC = () => {
             title: '员工ID',
             dataIndex: 'employeeid',
             key: 'employeeid',
+            sorter: (a: any, b: any) =>
+                Number(a.employeeid.substr(1, a.employeeid.length - 1)) -
+                Number(b.employeeid.substr(1, b.employeeid.length - 1)),
         },
         {
             title: '日薪/月薪',
@@ -97,6 +101,7 @@ const PageSub: React.FC = () => {
             title: '上月薪水',
             dataIndex: 'totalSalary',
             key: 'totalSalary',
+            sorter: (a: any, b: any) => a.totalSalary - b.totalSalary,
         },
         {
             title: '工龄',
@@ -120,6 +125,15 @@ const PageSub: React.FC = () => {
             ),
         },
     ]
+    const onSearch =(v:String)=>{
+        if(v.length==0 || v=="" || !v){
+            debugger
+            setTableData(totalTableData)
+        }else{
+            const filter = tableData.filter(item => item.employeeid.includes(v) || item.name==v)
+            setTableData(filter)
+        }
+    }
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values)
         let body = {}
@@ -185,6 +199,28 @@ const PageSub: React.FC = () => {
             message.info('提交失败, 请重新提交')
         }
     }
+
+    const downloadSalaryTable=()=>{
+        if(tableData.length>0){
+            const year = new Date().getFullYear()
+            const month = new Date().getMonth() + 1
+            let monthStr = month.toString()
+            if(month<10) monthStr = `0${monthStr}`
+            debugger
+            // const content = XLSX.utils.table_to_book(document.getElementById('salary-table'))
+            const topic = ['结算方式','姓名','员工id','日薪/月薪','加班时薪','中班补贴','晚班补贴','餐补','本月薪水','工龄']
+            const d = tableData.map(item => [item.salarytype, item.name, item.employeeid, item.salaryday,
+                item.salaryworkovertime, item.salarymiddleworkday, item.salarynightworkday, item.foodpayday,
+                item.totalSalary, item.worklong
+            ])
+
+            const content = XLSX.utils.aoa_to_sheet([topic, ...d])
+            const workbook = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(workbook,content)
+            XLSX.writeFile(workbook, `salary-${year}-${monthStr}.xlsx`)
+        }
+    }
+
 
     const selectMethod = (value: string) => {
         setMethod(value)
@@ -261,7 +297,9 @@ const PageSub: React.FC = () => {
     const query = async () => {
         const result = await fetchApi('api/salary/getallemployeesalary')
         if (result.code == '200') {
-            setTableData(result.data)
+            const d = result.data
+            setTableData(d)
+            setTotalTableData(d)
         } else {
             message.info('查询失败, 请重新提交')
         }
@@ -458,7 +496,13 @@ const PageSub: React.FC = () => {
                         <UploadOutlined /> 导入excel文件
                         <input id="importSalary" type="file" style={{ display: 'none' }} />
                     </label>
-                    <Table dataSource={tableData} columns={columns} size="small" />
+                    <Input.Search placeholder="输入员工名字或者id" allowClear onSearch={onSearch} style={{ width: 200, marginRight: 200 }} />
+                    <Button 
+                        onClick={downloadSalaryTable}
+                        type = "primary"
+                        >下载薪水表
+                    </Button>
+                    <Table dataSource={tableData} columns={columns} size="small" id="salary-table"/>
                     <Modal
                         title="修改薪水"
                         wrapClassName="vertical-center-modal"
