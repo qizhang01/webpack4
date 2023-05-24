@@ -19,6 +19,7 @@ import './index.less'
 import { Auth } from '@/auth'
 import fetchApi from '@/ajax/index'
 import XLSX from 'xlsx'
+import { AnyARecord } from 'dns'
 const { Option } = Select
 
 const formItemLayout = {
@@ -41,6 +42,7 @@ const PageSub: React.FC = () => {
     let [selectedItem, setSelectedItem] = React.useState({})
     const [salaryworkovertime, setSalaryworkovertime] = React.useState('')
     const [salaryLabel, setSalaryLabel] = React.useState('日薪')
+    const [foodpayday, setFoodpayday] = React.useState('') //餐补
     const columns = [
         {
             title: '结算方式',
@@ -87,6 +89,11 @@ const PageSub: React.FC = () => {
             key: 'salarynightworkday',
         },
         {
+            title: '餐补',
+            dataIndex: 'foodpayday',
+            key: 'foodpayday',
+        },
+        {
             title: '上月薪水',
             dataIndex: 'totalSalary',
             key: 'totalSalary',
@@ -112,18 +119,6 @@ const PageSub: React.FC = () => {
                 </span>
             ),
         },
-        /*eslint-disable*/
-        // {
-        //     title: '姓名',
-        //     dataIndex: 'userno',
-        //     key: 'userno',
-        // },
-        // {
-        //     title: '创建时间',
-        //     dataIndex: 'createtime',
-        //     key: 'createtime',
-        //     render: (_: any, record: any) => <a>{record.createtime.slice(0, 10)}</a>,
-        // },
     ]
     const onFinish = async (values: any) => {
         console.log('Received values of form: ', values)
@@ -140,7 +135,8 @@ const PageSub: React.FC = () => {
                 worklong=0,
                 worklongmoney=0,
                 salarymiddleworkday,
-                salarynightworkday
+                salarynightworkday,
+                foodpayday
             } = values
             body = {
                 salarytype,
@@ -154,28 +150,9 @@ const PageSub: React.FC = () => {
                 salarynightworkday,
                 totalSalary,
                 userno: Auth.loginInfo.id,
+                foodpayday
             }
             path = 'savesimpleday'
-        } else if (salarytype === '无满勤奖励') {
-            const {
-                name,
-                employeeid,
-                salaryworkovertime,
-                salaryday,
-                salarymiddleworkday,
-                salarynightworkday
-            } = values
-            body = {
-                salarytype,
-                name,
-                employeeid,
-                salaryworkovertime,
-                salarymiddleworkday,
-                salarynightworkday,
-                salaryday,
-                userno: Auth.loginInfo.id,
-            }
-            path = 'savesimplemonth'
         } else if (salarytype === '按比例核定') {
             const {
                 name,
@@ -184,6 +161,7 @@ const PageSub: React.FC = () => {
                 salaryday,
                 salarymiddleworkday,
                 salarynightworkday,
+                foodpayday
             } = values
             body = {
                 salarytype,
@@ -194,6 +172,7 @@ const PageSub: React.FC = () => {
                 salarynightworkday,
                 salaryday,
                 userno: Auth.loginInfo.id,
+                foodpayday
             }
             path = 'savesimplemonth'
         }
@@ -231,12 +210,23 @@ const PageSub: React.FC = () => {
     }
     
     const submitModel = async () => {
-        const body = {
+        let body: any = {
             ...selectedItem,
-            salaryday,
-            worklong,
-            worklongsalary,
-            salaryworkovertime
+        }
+        if(salaryday){
+            body.salaryday = salaryday
+        }
+        if(worklong){
+            body.worklong = worklong
+        }
+        if(worklongsalary){
+            body.worklongsalary = worklongsalary
+        }
+        if(salaryworkovertime){
+            body.salaryworkovertime = salaryworkovertime
+        }
+        if(foodpayday){
+            body.foodpayday = foodpayday
         }
         console.log(selectedItem)
         const result = await fetchApi(`api/salary/update`, JSON.stringify(body), 'POST')
@@ -250,7 +240,7 @@ const PageSub: React.FC = () => {
 
     const reset=(record:any)=>{
         setIsShowModel(true)
-        const {salarytype, name, employeeid,  salaryday, worklong=0, worklongmoney=0, salaryworkovertime}=record
+        const {salarytype, name, employeeid,  salaryday, worklong=0, worklongmoney=0, salaryworkovertime, foodpayday}=record
         if(salarytype=="日结"){
             setSalaryLabel("日薪")
         }else{
@@ -263,7 +253,8 @@ const PageSub: React.FC = () => {
             salaryday,
             worklong,
             worklongmoney,
-            salaryworkovertime
+            salaryworkovertime,
+            foodpayday
         })
     }
     
@@ -321,20 +312,26 @@ const PageSub: React.FC = () => {
             //遍历所有数据修改本月的工资信息
             tableData.forEach(item=>{
                 const {employeeid,salarytype ,salaryday, worklong=0, worklongmoney=0, salaryworkovertime=0, salarymiddleworkday=0,
-                    salarynightworkday=0}= item
+                    salarynightworkday=0, foodpayday =0}= item
                 if(excelData.has(employeeid)){
                     const {workday, daytotal, holidays=0, monthholiday=0, factrestdays=0, overtimehours=0, 
-                        nightworkday=0, middleworkday=0} = excelData.get(employeeid)
+                        nightworkday=0, middleworkday=0, monthCountryHoliday = 0, addedPay =0, deledPay = 0} = excelData.get(employeeid)
                     let totalSalary:number = 0
                     if(salarytype=="日结"){
-                        totalSalary = workday * (salaryday + (worklong * worklongmoney) / daytotal) + overtimehours*salaryworkovertime + middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
+                        totalSalary = workday * (foodpayday + salaryday + (worklong * worklongmoney) / daytotal) + overtimehours*salaryworkovertime + middleworkday*salarymiddleworkday + nightworkday*salarynightworkday + addedPay - deledPay
                     }else{
-                        totalSalary = Number(salaryday * workday/30 ) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday
+                        const num = workday + holidays + monthCountryHoliday  //实际工作天数 + 积累假期 + 当月国家法定
+                        const shouldworkday = daytotal - monthholiday //当月天数 - 月休息天数
+                        if(num>shouldworkday){
+                            totalSalary = salaryday + workday * foodpayday+ addedPay - deledPay
+                        }else {
+                            totalSalary = workday * foodpayday + Number(salaryday * num/shouldworkday ) + overtimehours*salaryworkovertime+ middleworkday*salarymiddleworkday + nightworkday*salarynightworkday + addedPay - deledPay
+                        }
                     }
                     lastJson[employeeid] = {totalSalary,salarytype}
                 }
             })
-            console.log("oooooooooooooooo",lastJson)
+
             const result = await fetchApi(
                 'api/salary/updatetotalsalary',
                 JSON.stringify(lastJson),
@@ -357,6 +354,9 @@ const PageSub: React.FC = () => {
         const overtimehours = el['加班时长']
         const middleworkday = el['中班天数']
         const nightworkday = el['晚班天数']
+        const monthCountryHoliday = el['法定假期']
+        const addedPay = el['补发']
+        const deledPay = el['扣除']
         return {
             personNo,
             workday,
@@ -366,7 +366,10 @@ const PageSub: React.FC = () => {
             factrestdays,
             overtimehours,
             middleworkday,
-            nightworkday
+            nightworkday,
+            monthCountryHoliday,
+            addedPay,
+            deledPay
         }
     }
     React.useEffect(() => {
@@ -391,9 +394,7 @@ const PageSub: React.FC = () => {
                             >
                                 <Option value="日结">日结</Option>
                                 {/* <Option value="月结">月结</Option> */}
-                                <Option value="无满勤奖励">月结-无满勤奖励</Option>
                                 <Option value="按比例核定">月结-按比例核定</Option>
-                                {/* <Option value="核定后扣除">核定后扣除</Option> */}
                             </Select>
                         </Form.Item>
                         <Form.Item
@@ -416,6 +417,10 @@ const PageSub: React.FC = () => {
                         <Form.Item name="salaryworkovertime" label="加班时薪" rules={[{ required: true, message: '必须输入加班工资' }]}>
                                 <InputNumber placeholder="加班时薪" style={InputNumberStl} />
                         </Form.Item>
+                        <Form.Item name="foodpayday" label="餐补" rules={[{ required: true, message: '必须输入餐补' }]}>
+                                <InputNumber placeholder="餐补" style={InputNumberStl} />
+                        </Form.Item>
+    
                         <Form.Item name="salarymiddleworkday" label="中班工资" rules={[{ required: true, message: '必须输入中班工资' }]}>
                                 <InputNumber placeholder="请输入中班工资" style={InputNumberStl} />
                         </Form.Item>
@@ -431,44 +436,6 @@ const PageSub: React.FC = () => {
                                 <InputNumber placeholder="请输入工龄月薪" style={InputNumberStl} />
                             </Form.Item>
                         </div>
-                        {/* <div style={{ display: method == '月结' ? 'block' : 'none' }}>
-                            <Form.Item name="workday" label="本月出勤">
-                                <InputNumber placeholder="请输入本月出勤天数" />
-                            </Form.Item>
-                            <Form.Item
-                                label="满勤天数"
-                                name="daytotal"
-                                rules={[{ required: true, message: '必须输入满勤天数' }]}
-                            >
-                                <InputNumber
-                                    min={0}
-                                    placeholder="请输入满勤天数"
-                                    style={InputNumberStl}
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                name="fullsalary"
-                                label="满勤工资"
-                                rules={[{ required: true, message: '必须输入满勤工资' }]}
-                            >
-                                <InputNumber placeholder="请输入满勤工资" />
-                            </Form.Item>
-                            <Form.Item
-                                name="daysalary"
-                                label="日工资"
-                                rules={[{ required: true, message: '必须输入日工资' }]}
-                            >
-                                <InputNumber placeholder="请输入日工资" />
-                            </Form.Item>
-                            <Form.Item
-                                name="overdaysalary"
-                                label="超勤工资"
-                                rules={[{ required: true, message: '必须输入超勤工资' }]}
-                            >
-                                <InputNumber placeholder="请输入超勤工资" />
-                            </Form.Item>
-                        </div> */}
-
                         <div style={{ marginTop: 30, marginBottom: 10 }}>
                             <Form.Item wrapperCol={{ span: 3, offset: 9 }}>
                                 <Button type="primary" htmlType="submit" block>
@@ -479,18 +446,18 @@ const PageSub: React.FC = () => {
                     </Form>
                 </Collapse.Panel>
                 <Collapse.Panel header="员工薪水列表" key="2">
-                <label
-                    className="ant-btn ant-btn-primary"
-                    style={{
-                        width: '160px',
-                        marginBottom: 6,
-                        marginLeft: 6,
-                        marginRight: 60
-                    }}
-                >
-                    <UploadOutlined /> 导入excel文件
-                    <input id="importSalary" type="file" style={{ display: 'none' }} />
-                </label>
+                    <label
+                        className="ant-btn ant-btn-primary"
+                        style={{
+                            width: '160px',
+                            marginBottom: 6,
+                            marginLeft: 6,
+                            marginRight: 60
+                        }}
+                    >
+                        <UploadOutlined /> 导入excel文件
+                        <input id="importSalary" type="file" style={{ display: 'none' }} />
+                    </label>
                     <Table dataSource={tableData} columns={columns} size="small" />
                     <Modal
                         title="修改薪水"
@@ -499,14 +466,25 @@ const PageSub: React.FC = () => {
                         visible={isShowModel}
                         onCancel={() => setIsShowModel(false)}
                         footer={[
-                            <Button key="close" onClick={() => setIsShowModel(false)}>
+                            <Button key="close" onClick={() => {
+                                setIsShowModel(false)
+                                setFoodpayday("")
+                                setWorklongsalary("")
+                                setSalaryday("")
+                                setSalaryworkovertime("")
+                                setWorklong("")
+                            }}>
                                 关闭
                             </Button>,
                             <Button
                                 key="submit"
                                 type="primary"
                                 disabled={
-                                    salaryday == ''
+                                    !salaryday  &&             
+                                    !worklong  &&
+                                    !salaryworkovertime &&
+                                    !foodpayday && 
+                                    !worklongsalary
                                 }
                                 onClick={submitModel}
                             >
@@ -550,6 +528,25 @@ const PageSub: React.FC = () => {
                                 }}
                                 style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
                                 value={salaryworkovertime}
+                            ></InputNumber>
+                        </Row>
+                        <Row>
+                            <span
+                                style={{
+                                    width: 100,
+                                    display: 'inline-block',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                餐补:
+                            </span>
+                            <InputNumber
+                                placeholder="请输入每日餐补"
+                                onChange={value => {
+                                    setFoodpayday(value)
+                                }}
+                                style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                                value={foodpayday}
                             ></InputNumber>
                         </Row>
                         <Row>
