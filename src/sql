@@ -37,11 +37,11 @@ CREATE TABLE `testinglib1` (
   `topic` varchar(1024) NOT NULL COMMENT '试题题目',
   `A` varchar(1024) NOT NULL COMMENT '试题选项',
   `B` varchar(1024) NOT NULL COMMENT '试题选项',
-  `C` varchar(1024) NOT NULL COMMENT '试题选项',
-  `D` varchar(1024) NOT NULL COMMENT '试题选项',
-  `E` varchar(1024) NOT NULL COMMENT '试题选项',
-  `F` varchar(1024) NOT NULL COMMENT '试题选项',
-  `G` varchar(1024) NOT NULL COMMENT '试题选项',
+  `C` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `D` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `E` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `F` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `G` varchar(1024) DEFAULT NULL COMMENT '试题选项',
   `oneSelect` int(2) DEFAULT 1 COMMENT '是否单选',
    `answer` varchar(10) NOT NULL COMMENT '正确答案',
    `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
@@ -54,11 +54,11 @@ CREATE TABLE `testinglib2` (
   `topic` varchar(1024) NOT NULL COMMENT '试题题目',
   `A` varchar(1024) NOT NULL COMMENT '试题选项',
   `B` varchar(1024) NOT NULL COMMENT '试题选项',
-  `C` varchar(1024) NOT NULL COMMENT '试题选项',
-  `D` varchar(1024) NOT NULL COMMENT '试题选项',
-  `E` varchar(1024) NOT NULL COMMENT '试题选项',
-  `F` varchar(1024) NOT NULL COMMENT '试题选项',
-  `G` varchar(1024) NOT NULL COMMENT '试题选项',
+  `C` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `D` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `E` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `F` varchar(1024) DEFAULT NULL COMMENT '试题选项',
+  `G` varchar(1024) DEFAULT NULL COMMENT '试题选项',
   `oneSelect` int(2) DEFAULT 1 COMMENT '是否单选',
    `answer` varchar(10) NOT NULL COMMENT '正确答案',
    `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
@@ -137,6 +137,7 @@ ALTER TABLE `salary_day` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL CO
 ALTER TABLE `salary_month` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
 ALTER TABLE `salary_day` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
 
-
+ALTER TABLE `salary_month` ADD COLUMN `foodpayday` int(3) DEFAULT NULL COMMENT '餐补' AFTER `salaryday`;
+ALTER TABLE `salary_day` ADD COLUMN `foodpayday` int(3) DEFAULT NULL COMMENT '餐补' AFTER `salaryday`;
 
 INSERT into authlist value (null,'0000','admin','123456','ADMIN',null,null,1) 

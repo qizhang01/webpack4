@@ -5,7 +5,6 @@ import {
     Input,
     InputNumber,
     Popconfirm,
-    Radio,
     Button,
     Checkbox,
     Modal,
@@ -14,13 +13,13 @@ import {
     Tag,
     Card,
 } from 'antd'
+import { UploadOutlined, InboxOutlined } from '@ant-design/icons'
 const { TextArea } = Input
 import { PlusOutlined, EditOutlined } from '@ant-design/icons'
 import { Panel } from '@/components/Panel'
 import { useLocation } from 'react-router-dom'
 import './index.less'
-import moment from 'moment'
-import { Auth } from '@/auth'
+import XLSX from 'xlsx'
 import fetchApi from '@/ajax/index'
 import { CustomTagProps } from 'rc-select/lib/BaseSelect'
 
@@ -209,6 +208,79 @@ const PageSub: React.FC = () => {
     }
     const onChangeTextArea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {}
 
+    React.useEffect(() => {
+        if (document.getElementById('importTest')) {
+            document.getElementById('importTest')?.addEventListener('change', e => {
+                inputHander(e)
+            })
+            return document.getElementById('importTest')?.removeEventListener('change', inputHander)
+        }
+    })
+    const getExelArray = (el: any, index: number) => {
+        const topic = el['题目']
+        const A = el['A']
+        const B = el['B']
+        const C = el['C'] || ''
+        const D = el['D'] || ''
+        const E = el['E'] || ''
+        let answer = el['正确答案']
+        const tip = el['解析'] || ''
+        if (answer == '对') {
+            answer = 'A'
+        } else if (answer == '错') {
+            answer = 'B'
+        }
+        return `('${tip}', '${topic}', '${A}', '${B}', '${C}', '${D}', '${answer}', 1)`
+    }
+
+    const inputHander = (e: any) => {
+        let data,
+            workbook,
+            items: any[] = [],
+            excelData: any[] = []
+        const files = e.target.files
+        if (!/\.(xlsx|xls)$/.test(files[0].name)) {
+            return alert('文件类型不正确')
+        }
+        let fileReader = new FileReader()
+
+        // // 以二进制方式打开文件
+        fileReader.readAsBinaryString(files[0])
+
+        fileReader.onload = async function(ev) {
+            try {
+                data = ev.target?.result
+                workbook = XLSX.read(data, {
+                    type: 'binary',
+                }) // 以二进制流方式读取得到整份excel表格对象
+            } catch {
+                return alert('文件有错误，请重新编辑后导入')
+            }
+
+            // // 遍历每张表读取
+            for (let sheet in workbook.Sheets) {
+                if (workbook.Sheets[sheet]) {
+                    items = items.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]))
+                    // break; // 如果只取第一张表，就取消注释这行
+                }
+            }
+            items.map((el, index) => {
+                const d = getExelArray(el, index)
+                excelData.push(d)
+            })
+            const result = await fetchApi(
+                'api/testing/importalltestcasebyexcel',
+                JSON.stringify(excelData),
+                'POST'
+            )
+            if (result.code == '200') {
+                message.info('导入成功')
+            } else {
+                message.info('导入失败')
+            }
+        }
+    }
+
     const tagRender = (props: CustomTagProps) => {
         const { label, closable, onClose } = props
         const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
@@ -232,10 +304,24 @@ const PageSub: React.FC = () => {
             <Card
                 style={{ width: '100%' }}
                 tabBarExtraContent={
-                    <EditOutlined
-                        onClick={edit}
-                        style={{ cursor: 'pointer', fontSize: '150%', color: '#1890ff' }}
-                    />
+                    <div>
+                        <label
+                            className="ant-btn ant-btn-primary"
+                            style={{
+                                width: '160px',
+                                marginBottom: 6,
+                                marginLeft: 6,
+                                marginRight: 40,
+                            }}
+                        >
+                            <UploadOutlined /> 导入excel文件
+                            <input id="importTest" type="file" style={{ display: 'none' }} />
+                        </label>
+                        <EditOutlined
+                            onClick={edit}
+                            style={{ cursor: 'pointer', fontSize: '150%', color: '#1890ff' }}
+                        />
+                    </div>
                 }
                 tabList={tabList}
                 activeTabKey={activeTabKey1}
