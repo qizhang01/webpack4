@@ -6,7 +6,7 @@ import {
     InputNumber,
     Popconfirm,
     Button,
-    Checkbox,
+    Spin,
     Modal,
     message,
     Col,
@@ -49,6 +49,7 @@ const PageSub: React.FC = () => {
     const [tabList, setTabList] = useState<TabList[]>([])
     const [testingTopicName, setTestingTopicName] = useState<string | undefined>(undefined)
     const [orginname, setOrginname] = useState('')
+    const [loading, setLoading] = useState(true)
     // const tabList = [
     //     {
     //         key: 'testinglib1',
@@ -86,11 +87,13 @@ const PageSub: React.FC = () => {
         return result
     }
     const getAllTopics = async () => {
+        !loading && setLoading(true)
         const result = await fetchApi(
             'api/testing/alltopics',
             JSON.stringify({ tablename: activeTabKey1 }),
             'POST'
         )
+        setLoading(false)
         setAllTopics(result.data)
     }
     const handleDelete = async (id: string) => {
@@ -161,7 +164,6 @@ const PageSub: React.FC = () => {
             ...obj,
         }
         const result = await fetchApi('api/testing/importonetopic', JSON.stringify(body), 'POST')
-        console.log(result)
         if (result.code == '200') {
             message.info('提交成功')
         } else {
@@ -215,7 +217,8 @@ const PageSub: React.FC = () => {
             })
             return document.getElementById('importTest')?.removeEventListener('change', inputHander)
         }
-    })
+    }, [])
+
     const getExelArray = (el: any, index: number) => {
         const topic = el['题目']
         const A = el['A']
@@ -256,7 +259,7 @@ const PageSub: React.FC = () => {
             } catch {
                 return alert('文件有错误，请重新编辑后导入')
             }
-
+            setLoading(true)
             // // 遍历每张表读取
             for (let sheet in workbook.Sheets) {
                 if (workbook.Sheets[sheet]) {
@@ -268,11 +271,13 @@ const PageSub: React.FC = () => {
                 const d = getExelArray(el, index)
                 excelData.push(d)
             })
+
             const result = await fetchApi(
                 'api/testing/importalltestcasebyexcel',
-                JSON.stringify(excelData),
+                JSON.stringify({ excelData, tablename: activeTabKey1 }),
                 'POST'
             )
+            getAllTopics()
             if (result.code == '200') {
                 message.info('导入成功')
             } else {
@@ -300,146 +305,164 @@ const PageSub: React.FC = () => {
         )
     }
     return loginInfo.roles.includes('ADMIN') ? (
-        <Panel>
-            <Card
-                style={{ width: '100%' }}
-                tabBarExtraContent={
-                    <div>
-                        <label
-                            className="ant-btn ant-btn-primary"
-                            style={{
-                                width: '160px',
-                                marginBottom: 6,
-                                marginLeft: 6,
-                                marginRight: 40,
-                            }}
-                        >
-                            <UploadOutlined /> 导入excel文件
-                            <input id="importTest" type="file" style={{ display: 'none' }} />
-                        </label>
+        <>
+            <label
+                className="ant-btn ant-btn-primary test-input-button"
+                style={{
+                    width: '160px',
+                    position: 'absolute',
+                    top: 40,
+                    right: 150,
+                    zIndex: 100,
+                }}
+            >
+                <UploadOutlined /> 导入excel文件
+                <input id="importTest" type="file" style={{ display: 'none' }} />
+            </label>
+            <Panel>
+                {loading && (
+                    <div className="loadingcontent">
+                        <Spin tip="Loading" size="large">
+                            <div className="content" style={{ padding: 50, borderRadius: 4 }} />
+                        </Spin>
+                    </div>
+                )}
+                <Card
+                    style={{ width: '100%' }}
+                    tabBarExtraContent={
                         <EditOutlined
                             onClick={edit}
                             style={{ cursor: 'pointer', fontSize: '150%', color: '#1890ff' }}
                         />
-                    </div>
-                }
-                tabList={tabList}
-                activeTabKey={activeTabKey1}
-                onTabChange={key => {
-                    onTab1Change(key)
-                }}
-            >
-                {renderTopicCard()}
-                <span
-                    style={{
-                        width: 120,
-                        height: 100,
-                        marginTop: 10,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '1px dashed #1890ff',
-                        cursor: 'pointer',
+                    }
+                    tabList={tabList}
+                    activeTabKey={activeTabKey1}
+                    onTabChange={key => {
+                        onTab1Change(key)
                     }}
-                    onClick={handlePlusIcon}
                 >
-                    <PlusOutlined style={{ fontSize: '300%', color: '#1890ff' }} />
-                </span>
-            </Card>
-            <Modal
-                title="添加试题"
-                wrapClassName="vertical-center-modal"
-                width="600px"
-                visible={isShowModel}
-                onCancel={closeModel}
-                footer={null}
-            >
-                <Form name="config-form" {...formItemLayout} onFinish={onFinish} initialValues={{}}>
-                    <Form.Item name="topic" label="标题">
-                        <TextArea showCount style={{ height: 80 }} onChange={onChangeTextArea} />
-                    </Form.Item>
-                    <Form.Item
-                        name="A"
-                        label="A"
-                        rules={[{ required: true, message: '必须输入选项' }]}
+                    {renderTopicCard()}
+                    <span
+                        style={{
+                            width: 120,
+                            height: 100,
+                            marginTop: 10,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px dashed #1890ff',
+                            cursor: 'pointer',
+                        }}
+                        onClick={handlePlusIcon}
                     >
-                        <Input placeholder="请输入选项1" />
-                    </Form.Item>
-                    <Form.Item
-                        name="B"
-                        label="B"
-                        rules={[{ required: true, message: '必须输入选项' }]}
+                        <PlusOutlined style={{ fontSize: '300%', color: '#1890ff' }} />
+                    </span>
+                </Card>
+
+                <Modal
+                    title="添加试题"
+                    wrapClassName="vertical-center-modal"
+                    width="600px"
+                    visible={isShowModel}
+                    onCancel={closeModel}
+                    footer={null}
+                >
+                    <Form
+                        name="config-form"
+                        {...formItemLayout}
+                        onFinish={onFinish}
+                        initialValues={{}}
                     >
-                        <Input placeholder="请输入选项2" />
-                    </Form.Item>
-                    <Form.Item name="C" label="C">
-                        <Input placeholder="请输入选项3" />
-                    </Form.Item>
-                    <Form.Item name="D" label="D">
-                        <Input placeholder="请输入选项4" />
-                    </Form.Item>
-                    <Form.Item
-                        label="正确答案"
-                        name="answer"
-                        rules={[{ required: true, message: '必须输入正确答案' }]}
-                    >
-                        <Select
-                            mode="multiple"
-                            showArrow
-                            tagRender={tagRender}
-                            style={{ width: '100%' }}
-                            options={options}
-                        />
-                        {/* <InputNumber min={1} placeholder="请输入正确答案" style={InputNumberStl} /> */}
-                    </Form.Item>
+                        <Form.Item name="topic" label="标题">
+                            <TextArea
+                                showCount
+                                style={{ height: 80 }}
+                                onChange={onChangeTextArea}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            name="A"
+                            label="A"
+                            rules={[{ required: true, message: '必须输入选项' }]}
+                        >
+                            <Input placeholder="请输入选项1" />
+                        </Form.Item>
+                        <Form.Item
+                            name="B"
+                            label="B"
+                            rules={[{ required: true, message: '必须输入选项' }]}
+                        >
+                            <Input placeholder="请输入选项2" />
+                        </Form.Item>
+                        <Form.Item name="C" label="C">
+                            <Input placeholder="请输入选项3" />
+                        </Form.Item>
+                        <Form.Item name="D" label="D">
+                            <Input placeholder="请输入选项4" />
+                        </Form.Item>
+                        <Form.Item
+                            label="正确答案"
+                            name="answer"
+                            rules={[{ required: true, message: '必须输入正确答案' }]}
+                        >
+                            <Select
+                                mode="multiple"
+                                showArrow
+                                tagRender={tagRender}
+                                style={{ width: '100%' }}
+                                options={options}
+                            />
+                            {/* <InputNumber min={1} placeholder="请输入正确答案" style={InputNumberStl} /> */}
+                        </Form.Item>
+                        <div style={{ textAlign: 'center', marginTop: 10 }}>
+                            <Button type="primary" htmlType="submit" block style={{ width: '40%' }}>
+                                完成提交
+                            </Button>
+                        </div>
+                    </Form>
+                </Modal>
+
+                <Modal
+                    title="修改试题名称"
+                    wrapClassName="vertical-center-modal"
+                    width="600px"
+                    visible={isShowModifyNameModel}
+                    onCancel={closeModifyNameModel}
+                    footer={null}
+                >
+                    <div>
+                        原名称:
+                        <Input
+                            placeholder="请输入旧名称"
+                            value={orginname}
+                            disabled
+                            style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                        ></Input>
+                    </div>
+                    <div>
+                        新名称:
+                        <Input
+                            placeholder="请输入新名称"
+                            onChange={e => {
+                                setTestingTopicName(e.target.value)
+                            }}
+                            value={testingTopicName}
+                            style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                        ></Input>
+                    </div>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Button type="primary" htmlType="submit" block style={{ width: '40%' }}>
+                        <Button
+                            type="primary"
+                            onClick={toModifyName}
+                            disabled={!testingTopicName}
+                            style={{ width: '40%' }}
+                        >
                             完成提交
                         </Button>
                     </div>
-                </Form>
-            </Modal>
-
-            <Modal
-                title="修改试题名称"
-                wrapClassName="vertical-center-modal"
-                width="600px"
-                visible={isShowModifyNameModel}
-                onCancel={closeModifyNameModel}
-                footer={null}
-            >
-                <div>
-                    原名称:
-                    <Input
-                        placeholder="请输入旧名称"
-                        value={orginname}
-                        disabled
-                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
-                    ></Input>
-                </div>
-                <div>
-                    新名称:
-                    <Input
-                        placeholder="请输入新名称"
-                        onChange={e => {
-                            setTestingTopicName(e.target.value)
-                        }}
-                        value={testingTopicName}
-                        style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
-                    ></Input>
-                </div>
-                <div style={{ textAlign: 'center', marginTop: 10 }}>
-                    <Button
-                        type="primary"
-                        onClick={toModifyName}
-                        disabled={!testingTopicName}
-                        style={{ width: '40%' }}
-                    >
-                        完成提交
-                    </Button>
-                </div>
-            </Modal>
-        </Panel>
+                </Modal>
+            </Panel>
+        </>
     ) : (
         <div>功能尚未完善</div>
     )

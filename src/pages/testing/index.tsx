@@ -28,25 +28,12 @@ type optionObj = {
 }
 
 type ListType = {
+    id: number
     topic: string
     selectItem: string[]
     selected: string
 }
 
-// const list = [
-//     { topic: '你的家乡在哪里呢？', selectItem: ['长沙', '重庆', '武汉', '北京'], selected: '' },
-//     { topic: '你的爱好有哪些呢？', selectItem: ['游戏', '打架', '下棋', '读书'], selected: '' },
-//     {
-//         topic: '如何去实现自己的梦想和理想？',
-//         selectItem: [
-//             '自立更生艰苦奋战',
-//             '无所事事天天睡觉',
-//             '人生苦短我选躺平',
-//             '天生我才必有用，过完一天是一天',
-//         ],
-//         selected: '',
-//     },
-// ]
 type LoginInfo = {
     id: number
     roles: string
@@ -187,13 +174,20 @@ const Testing: React.FC = () => {
         tablename = value //表名保存
         const result = await fetchApi(
             'api/testing/alltopics',
-            JSON.stringify({ tablename: value }),
+            JSON.stringify({ tablename: value, number: 100 }), //随机100道题
             'POST'
         )
         const list = result.data.map((item: any) => {
+            let selectItem = [item.A, item.B]
+            if (item.D) {
+                selectItem = [item.A, item.B, item.C, item.D]
+            } else if (item.C) {
+                selectItem = [item.A, item.B, item.C]
+            }
             return {
+                id: item.id,
                 topic: item.topic,
-                selectItem: [item.A, item.B, item.C, item.D, item.E, item.F, item.G],
+                selectItem: [item.A, item.B, item.C, item.D],
                 selected: '',
             }
         })
@@ -229,8 +223,9 @@ const Testing: React.FC = () => {
         map.set(3, 'D')
         map.set(4, 'E')
         map.set(5, 'F')
-        map.set(6, 'G')
-        const selectedArr: string[] = list.map(item => map.get(item.selected))
+        const selectedArr: any[] = list.map(item => {
+            return { [item.id]: map.get(item.selected) }
+        })
         const result = await fetchApi(
             'api/testing/submittestingresult',
             JSON.stringify({
@@ -241,22 +236,6 @@ const Testing: React.FC = () => {
             'POST'
         )
 
-        // let errNumber = 0,
-        //     tempObj: any[] = []
-        // for (let i = 0; i < selectedArr.length; i++) {
-        //     if (selectedArr[i] !== res[i].answer) {
-        //         errNumber++
-        //         tempObj.push({
-        //             value: selectedArr[i],
-        //             isTrue: false,
-        //         })
-        //     } else {
-        //         tempObj.push({
-        //             value: selectedArr[i],
-        //             isTrue: true,
-        //         })
-        //     }
-        // }
         setLastResult({
             totalNumber: selectedArr.length,
             rightNumber: result.data.rightNumber,
@@ -337,7 +316,7 @@ const Testing: React.FC = () => {
                             <div className="subject-introduce">
                                 *注意事项：
                                 <span style={{ color: '#1890ff' }}>
-                                    本测试是关于专业知识的测试, 试题分为单选题和多选题,
+                                    本测试是关于专业知识的测试, 试题为单选题,
                                     务必一次性做完，做题期间不能退出。首先请选择试题的类型。
                                 </span>
                             </div>
