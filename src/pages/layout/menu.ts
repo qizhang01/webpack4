@@ -61,3 +61,22 @@ export const permission = {
         },
     ],
 }
+
+export const submitflow = {
+    title: '审批流程',
+    show: true,
+    children: [
+        {
+            title: '流程发起',
+            uri: '/root/onoroffsubmit',
+        },
+        {
+            title: '营运审批',
+            uri: '/root/operatesubmit',
+        },
+        {
+            title: '人事告知',
+            uri: '/root/hrsubmit',
+        },
+    ],
+}

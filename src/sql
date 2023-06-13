@@ -23,13 +23,16 @@ CREATE TABLE `authlist` (
   `name` varchar(63) NOT NULL COMMENT '用户名',
   `password` varchar(63) NOT NULL COMMENT '密码',
   `roles` varchar(63) NOT NULL COMMENT '权限',
+  `score` varchar(256) DEFAULT NULL COMMENT '测试成绩'
+  `departmentname` varchar(256) DEFAULT NULL COMMENT '所属项目部'
   `lastlogintime` varchar(63)  DEFAULT NULL COMMENT '最后登录时间',
-  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间', 
  `ifopen` int(2)  DEFAULT 1 COMMENT '是否启用',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户控制表';
 
 ALTER TABLE `authlist` add score varchar(256) DEFAULT NULL COMMENT '测试成绩' AFTER roles;
+ALTER TABLE `authlist` add departmentname varchar(256) DEFAULT NULL COMMENT '所属项目部' AFTER roles;
 
 CREATE TABLE `testinglib1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -97,6 +100,7 @@ CREATE TABLE `salary_day` (
   `employeeid` varchar(11) NOT NULL,
   `name` varchar(10) NOT NULL COMMENT '员工姓名',
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
+  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
@@ -131,6 +135,7 @@ CREATE TABLE `salary_month` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='月薪无满勤薪水表';
 
+ALTER TABLE `salary_day` ADD COLUMN `department` varchar(32) DEFAULT NULL COMMENT '员工部门' AFTER `salarytype`;
 
 ALTER TABLE `salary_month` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
 ALTER TABLE `salary_day` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
@@ -141,3 +146,20 @@ ALTER TABLE `salary_month` ADD COLUMN `foodpayday` int(3) DEFAULT NULL COMMENT '
 ALTER TABLE `salary_day` ADD COLUMN `foodpayday` int(3) DEFAULT NULL COMMENT '餐补' AFTER `salaryday`;
 
 INSERT into authlist value (null,'0000','admin','123456','ADMIN',null,null,1) 
+
+CREATE TABLE `transaction` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(6) NOT NULL COMMENT '员工姓名',
+  `type` varchar(4) DEFAULT NULL COMMENT '事物类型',
+  `departmentname` varchar(10) DEFAULT NULL COMMENT '所属项目部',
+  `offerpersonname` varchar(6) DEFAULT NULL COMMENT '录入人姓名',
+  `operatestatus` varchar(4) DEFAULT NULL COMMENT '营运部状态',
+  `submitpersonname` varchar(4) DEFAULT NULL COMMENT '审批人姓名',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  `submittedtime` varchar(10) DEFAULT NULL  COMMENT  '营运审批时间',
+  `hrstatus` varchar(4) DEFAULT NULL  COMMENT  'hr审批状态',
+  `hrpersonname` varchar(4) DEFAULT NULL COMMENT 'hr审批人姓名',
+  `hrsubmittedtime` varchar(10) DEFAULT NULL  COMMENT  'hr审批时间',
+  UNIQUE (`id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='员工事物表';

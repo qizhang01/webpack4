@@ -1,4 +1,4 @@
-const AUTH_KEY = 'xx-auth-key'
+export const AUTH_KEY = 'xx-auth-key'
 interface auth {
     id: string
     roles: string

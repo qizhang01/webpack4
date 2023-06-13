@@ -47,6 +47,9 @@ export default class Index extends React.Component {
         addEmployeeName: '',
         ifSuccessOnce: false,  //是否成功新增至少一名
         userno: '', //员工
+        deparmentName: '',
+        isShowSetDepModel: false,
+        selectedItem: null
     }
 
     columns = [
@@ -59,6 +62,11 @@ export default class Index extends React.Component {
             dataIndex: 'name',
             key:'name'
         },{
+            title: '部门',
+            dataIndex: 'deparmentname',
+            key:'deparmentname'
+        },
+        {
             title: '权限',
             dataIndex: 'roles',
             key:'roles',
@@ -105,6 +113,8 @@ export default class Index extends React.Component {
                 <a href="javascript:;" onClick={()=>this.editStatus(record)}>{ record.ifopen==1?'停用':'启用' }</a>
                 <Divider type="vertical"/>
                 <a href="javascript:;" onClick={()=>this.initSign(record)}>重置密码</a>
+                <Divider type="vertical"/>
+                <a href="javascript:;" onClick={()=>this.initDeparment(record)}>项目部</a>
               </span>
             ),
         }
@@ -146,6 +156,10 @@ export default class Index extends React.Component {
         //刷新列表
         res && this.getAllUsersList()
     }
+    
+    initDeparment = record => {
+        this.setState({selectedItem: record})
+    }
 
     initSign= async record =>{
         const password = generator.generate({
@@ -179,6 +193,12 @@ export default class Index extends React.Component {
             isShowModel: true,
             userno:''
         })
+    }
+    
+    updateDepartmentName = async ()=>{
+        const { id} = this.state.selectedItem
+        const res = await fetchAPI('/api/users/updatedepartment',JSON.stringify({id, departmentname: this.state.deparmentName}),"POST")
+        res && this.getAllUsersList()
     }
 
     submitModel=async ()=>{
@@ -225,7 +245,7 @@ export default class Index extends React.Component {
         }
 
     }
-
+    
     cancelModel=()=>{
         this.setState({isShowModel: false})
         //如果新增至少一名 则需要刷新数据
@@ -233,7 +253,15 @@ export default class Index extends React.Component {
             this.getAllUsersList()
         }
     }
+    
+    cancelDepModel=()=>{
+        this.setState({isShowSetDepModel: false})
+        this.getAllUsersList()
+    }
 
+    submitDepModel=()=>{
+
+    }
     onChangeCode=(e)=>{
        this.setState({
         userno: e.target.value
@@ -243,6 +271,9 @@ export default class Index extends React.Component {
         this.setState({
             addEmployeeName: e.target.value
         })
+    }
+    onChangeDepName=(e)=>{
+        this.setState({deparmentName: e.target.value})
     }
     onSelectRoles=(e)=>{
         this.setState({
@@ -278,7 +309,7 @@ export default class Index extends React.Component {
         }
         const {employeeList,isShowModel,
             addEmployeeName,addRoles,
-            userno,
+            userno, selectedItem
         } = this.state
         return (
             <Panel>
@@ -346,6 +377,34 @@ export default class Index extends React.Component {
                                 onChange={this.onSelectRoles}
                                 style={{marginLeft: 10}}
                             />
+                        </Row>
+                    </Modal>
+                    <Modal
+                        title="录入项目部"
+                        wrapClassName="vertical-center-modal"
+                        width='600px'
+                        visible={isShowSetDepModel}
+                        onCancel={this.cancelDepModel}
+                        footer={[
+                            <Button key="close" onClick={this.cancelDepModel}>
+                               关闭
+                            </Button>,
+                            <Button key="submit" disabled = {!deparmentName} type="primary"  onClick={this.submitDepModel}>
+                               确定
+                            </Button>,
+                        ]}
+                    >
+                        <Row>
+                            <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>姓名: {selectedItem.name}</span>
+                        </Row>
+                        <Row>
+                            <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>项目部名称:</span>
+                            <Input placeholder="请输入项目部名称"
+                                    onChange={this.onChangeDepName}
+                                    style={{ width: 200,marginLeft: 10,marginBottom: 10  }}
+                                    value={deparmentName}
+                                >
+                            </Input>
                         </Row>
                     </Modal>
                 </div>
