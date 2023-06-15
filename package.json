@@ -26,14 +26,6 @@
     "mock": "node mock/mock-service.js",
     "dll": "webpack --config ./config/webpack.dll.config.js --env=prod"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8",
-    "iOS >= 8",
-    "Firefox >= 20",
-    "Android > 4.4"
-  ],
   "devDependencies": {
     "@babel/core": "^7.18.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",

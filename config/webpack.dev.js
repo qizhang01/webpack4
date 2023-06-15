@@ -8,13 +8,11 @@ const config = require('./config');
 const devWebpackConfig = merge.smart(baseWebpackConfig, {
     mode: 'development',
     output: {
-        filename: 'js/[name].[hash:8].js',
+       
     },
     module: {
         rules: [
-            {
-                oneOf: []
-            }
+
         ]
     },
     plugins: [
@@ -31,17 +29,6 @@ const devWebpackConfig = merge.smart(baseWebpackConfig, {
     devServer: {
         ...config.devServer
     },
-    stats: {
-        colors: true,
-        children: false,
-        chunks: false,
-        chunkModules: false,
-        modules: false,
-        builtAt: false,
-        entrypoints: false,
-        assets: false,
-        version: false
-    }
 });
 
 module.exports = new Promise((resolve, reject) => {

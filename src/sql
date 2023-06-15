@@ -100,7 +100,7 @@ CREATE TABLE `salary_day` (
   `employeeid` varchar(11) NOT NULL,
   `name` varchar(10) NOT NULL COMMENT '员工姓名',
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
-  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
+  `departmentname` varchar(32) DEFAULT NULL COMMENT '员工部门',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
@@ -121,7 +121,7 @@ CREATE TABLE `salary_month` (
   `name` varchar(10) NOT NULL COMMENT '员工姓名',
   `president` varchar(10) DEFAULT NULL COMMENT '员工职位',
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
-  `department` varchar(32) DEFAULT NULL COMMENT '员工部门',
+  `departmentname` varchar(32) DEFAULT NULL COMMENT '员工部门',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
@@ -135,7 +135,8 @@ CREATE TABLE `salary_month` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='月薪无满勤薪水表';
 
-ALTER TABLE `salary_day` ADD COLUMN `department` varchar(32) DEFAULT NULL COMMENT '员工部门' AFTER `salarytype`;
+ALTER TABLE `salary_day` ADD COLUMN `departmentname` varchar(16) DEFAULT NULL COMMENT '员工部门' AFTER `salarytype`;
+ALTER TABLE `salary_month` ADD COLUMN `departmentname` varchar(16) DEFAULT NULL COMMENT '员工部门' AFTER `salarytype`;
 
 ALTER TABLE `salary_month` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
 ALTER TABLE `salary_day` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
@@ -163,3 +164,39 @@ CREATE TABLE `transaction` (
   UNIQUE (`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='员工事物表';
+
+CREATE TABLE `overtimework` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(6) NOT NULL COMMENT '员工姓名',
+  `departmentname` varchar(10) DEFAULT NULL COMMENT '所属项目部',
+  `type` varchar(50) DEFAULT NULL COMMENT '加班原因',
+  `offerpersonname` varchar(6) DEFAULT NULL COMMENT '录入人姓名',
+  `operatestatus` varchar(4) DEFAULT NULL COMMENT '营运部状态',
+  `submitpersonname` varchar(4) DEFAULT NULL COMMENT '审批人姓名',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  `submittedtime` varchar(10) DEFAULT NULL  COMMENT  '营运审批时间',
+  `hrstatus` varchar(4) DEFAULT NULL  COMMENT  'hr审批状态',
+  `hrpersonname` varchar(4) DEFAULT NULL COMMENT 'hr审批人姓名',
+  `hrsubmittedtime` varchar(10) DEFAULT NULL  COMMENT  'hr审批时间',
+  UNIQUE (`id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='加班事物表';
+
+CREATE TABLE `addsalary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(6) NOT NULL COMMENT '员工姓名',
+  `type` varchar(4) DEFAULT NULL COMMENT '事物类型',
+  `departmentname` varchar(10) DEFAULT NULL COMMENT '所属项目部',
+  `nowsalary` int(6) DEFAULT NULL COMMENT '目前薪水',
+  `expectedsalary` int(6) DEFAULT NULL COMMENT '期望薪水',
+  `offerpersonname` varchar(6) DEFAULT NULL COMMENT '录入人姓名',
+  `operatestatus` varchar(4) DEFAULT NULL COMMENT '营运部状态',
+  `submitpersonname` varchar(4) DEFAULT NULL COMMENT '审批人姓名',
+  `createtime` datetime NOT NULL DEFAULT NOW() COMMENT  '创建时间',
+  `submittedtime` varchar(10) DEFAULT NULL  COMMENT  '营运审批时间',
+  `hrstatus` varchar(4) DEFAULT NULL  COMMENT  'hr审批状态',
+  `hrpersonname` varchar(4) DEFAULT NULL COMMENT 'hr审批人姓名',
+  `hrsubmittedtime` varchar(10) DEFAULT NULL  COMMENT  'hr审批时间',
+  UNIQUE (`id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='调薪事物表';

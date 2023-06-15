@@ -64,6 +64,11 @@ const PageSub: React.FC = () => {
                 Number(b.employeeid.substr(1, b.employeeid.length - 1)),
         },
         {
+            title: '所在部门',
+            dataIndex: 'departmentname',
+            key: 'departmentname',
+        },
+        {
             title: '日薪/月薪',
             dataIndex: 'salaryday',
             key: 'salaryday',

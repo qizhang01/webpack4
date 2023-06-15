@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Form,
     Select,
@@ -44,35 +44,124 @@ const items = [
     },
 ]
 
-const PageSub: React.FC = () => {
+const PageSub= () => {
     const [key, setkey] = useState(1)
+    const [employeelist, setEmployeeList] = useState([])
+    const [overtimeworklist, setOvertimeWorklist] = useState([])
+    const [nowsalary, setNowsalary] = useState(null)
     const info = window.localStorage.getItem(AUTH_KEY)
     const departmentname = info ? JSON.parse(info).departmentname : ''
-    const onFinish = async (values: any) => {
+
+    useEffect(() => {
+        fetchEmployee()
+    }, [])
+    const fetchEmployee = () => {}
+    const onFinish = async (values) => {
         if (key == 1) {
             console.log(key)
-        } else if (key == 2) {
-            console.log(key)
+            const { type, name, departmentname } = values
+            const submitname = info ? JSON.parse(info).name : ''
+            // submitonoroff
+            const body = {
+                type,
+                name,
+                departmentname,
+                submitname,
+            }
+            const result = await fetchApi('api/submitonoroff', JSON.stringify(body), 'POST')
+            if (result.code == '200') {
+                message.info('申请成功')
+            } else {
+                message.info('申请失败, 请重新提交')
+            }
         } else if (key == 3) {
-            console.log(key)
+            const { name, salarytype, expectedsalary } = values
+            const body = {
+                name,
+                salarytype,
+                nowsalary,
+                expectedsalary,
+            }
+            const result = await fetchApi('api/submitaddsalary', JSON.stringify(body), 'POST')
+            if (result.code == '200') {
+                message.info('申请成功')
+            } else {
+                message.info('申请失败, 请重新提交')
+            }
         }
     }
 
-    const onChange = (key: any) => {
+    const onChange = (key) => {
         setkey(key)
     }
 
+    React.useEffect(() => {
+        if(document.getElementById('importdepart')){           
+            document.getElementById('importdepart')?.addEventListener('change', e => {
+                inputHander(e)
+            })
+            return document.getElementById('importdepart')?.removeEventListener('change', inputHander)
+        }   
+    })
+    
+    const inputHander = (e) => {
+        let data,
+            workbook,
+            items = [],
+            lastJson={}
+        const files = e.target.files
+        if (!/\.(xlsx|xls)$/.test(files[0].name)) {
+            return alert('文件类型不正确')
+        }
+        let fileReader = new FileReader()
+
+        // // 以二进制方式打开文件
+        fileReader.readAsBinaryString(files[0])
+
+        fileReader.onload = async function(ev) {
+            try {
+                data = ev.target?.result
+                workbook = XLSX.read(data, {
+                    type: 'binary',
+                }) // 以二进制流方式读取得到整份excel表格对象
+            } catch {
+                return alert('文件有错误，请重新编辑后导入')
+            }
+
+            // // 遍历每张表读取
+            for (let sheet in workbook.Sheets) {
+                if (workbook.Sheets[sheet]) {
+                    items = items.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]))
+                    // break; // 如果只取第一张表，就取消注释这行
+                }
+            }
+            items.map((el, index) => {
+                const id = el["员工编号"]
+                const departmentname = el["所在现场"]
+                // const identityid = el["身份证号"]
+                // const period = el["入职时间"]
+                // const telephone = el["联系电话"]
+                lastJson[id]= departmentname
+            }) 
+            const result = await fetchApi(
+                'api/salary/updatedepartment',
+                JSON.stringify(lastJson),
+                'POST'
+            )
+        }
     const selectMethod = () => {}
     const selectDepartment = () => {}
     const selectSalaryType = () => {}
     const handleClick = () => {}
-    const handleClose = () => {}
+    const handleClose = (index: any) => {}
+    const onRangeChange = (dates: any, dateStrings: any) => {}
+    const handleInput = (v: any) => {}
     return (
         <Panel>
             <Collapse onChange={onChange} accordion>
                 <Collapse.Panel header="入职离职申请" key="1">
-                    <Form name="config-form" {...formItemLayout} onFinish={onFinish}>
-                        <Form.Item name="offertype" label="入职/离职">
+                    <Form name="config-form-onoroff" {...formItemLayout} onFinish={onFinish}>
+                        <Form.Item name="type" label="入职/离职">
                             <Select
                                 defaultValue="入职"
                                 style={{ width: 280 }}
@@ -109,6 +198,18 @@ const PageSub: React.FC = () => {
                                 </Button>
                             </Form.Item>
                         </div>
+                        <label
+                            className="ant-btn ant-btn-primary"
+                            style={{
+                                width: '160px',
+                                marginBottom: 6,
+                                marginLeft: 6,
+                                marginRight: 60
+                            }}
+                        >
+                            <UploadOutlined /> 导入excel文件
+                            <input id="importdepart" type="file" style={{ display: 'none' }} />
+                        </label>
                     </Form>
                 </Collapse.Panel>
                 <Collapse.Panel header="加班申请" key="2">
@@ -118,23 +219,36 @@ const PageSub: React.FC = () => {
                             style={{ width: 280, display: 'block' }}
                             onChange={selectDepartment}
                         >
-                            <Option value="入职">入职</Option>
-                            <Option value="离职">离职</Option>
+                            {employeelist.map(item => (
+                                <Option value={item.name} key={item.id}>
+                                    {item.name}
+                                </Option>
+                            ))}
                         </Select>
                         <div style={{ marginTop: 20, marginBottom: 20 }}>
                             <Space size={[0, 8]} wrap>
-                                <Tag color="gold" closable onClose={handleClose}>
-                                    李军
-                                </Tag>
-                                <Tag color="gold" closable onClose={handleClose}>
-                                    王琦
-                                </Tag>
-                                <Tag color="gold" closable onClose={handleClose}>
-                                    张其中
-                                </Tag>
+                                {overtimeworklist.map((item: any) => (
+                                    <Tag
+                                        color="gold"
+                                        key={item.id}
+                                        closable
+                                        onClose={item => handleClose(item)}
+                                    >
+                                        {item.name}
+                                    </Tag>
+                                ))}
                             </Space>
                         </div>
-                        <TimePicker.RangePicker style={{ width: 280 }} />
+                        <TimePicker.RangePicker
+                            style={{ width: 280, marginBottom: 20 }}
+                            onChange={onRangeChange}
+                        />
+                        加班原因:
+                        <input
+                            placeholder="请输入姓名"
+                            style={{ width: 280 }}
+                            onChange={handleInput}
+                        />
                     </div>
                     <div
                         style={{
@@ -150,7 +264,7 @@ const PageSub: React.FC = () => {
                     </div>
                 </Collapse.Panel>
                 <Collapse.Panel header="调薪申请" key="3">
-                    <Form name="config-form" {...formItemLayout} onFinish={onFinish}>
+                    <Form name="config-form-salary" {...formItemLayout} onFinish={onFinish}>
                         <Form.Item name="name" label="姓名">
                             <Input placeholder="请输入员工姓名" style={{ width: 280 }} />
                         </Form.Item>
@@ -165,7 +279,7 @@ const PageSub: React.FC = () => {
                             </Select>
                         </Form.Item>
                         <Form.Item name="nowsalary" label="当前薪水">
-                            <span></span>
+                            <span>{nowsalary}</span>
                         </Form.Item>
                         <Form.Item
                             name="expectedsalary"
