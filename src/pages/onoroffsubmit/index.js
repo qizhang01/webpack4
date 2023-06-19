@@ -149,13 +149,14 @@ const PageSub= () => {
                 'POST'
             )
         }
+    }
     const selectMethod = () => {}
     const selectDepartment = () => {}
     const selectSalaryType = () => {}
     const handleClick = () => {}
-    const handleClose = (index: any) => {}
-    const onRangeChange = (dates: any, dateStrings: any) => {}
-    const handleInput = (v: any) => {}
+    const handleClose = (index) => {}
+    const onRangeChange = (dates, dateStrings) => {}
+    const handleInput = (v) => {}
     return (
         <Panel>
             <Collapse onChange={onChange} accordion>
@@ -227,7 +228,7 @@ const PageSub= () => {
                         </Select>
                         <div style={{ marginTop: 20, marginBottom: 20 }}>
                             <Space size={[0, 8]} wrap>
-                                {overtimeworklist.map((item: any) => (
+                                {overtimeworklist.map((item) => (
                                     <Tag
                                         color="gold"
                                         key={item.id}
@@ -302,4 +303,5 @@ const PageSub= () => {
         </Panel>
     )
 }
+
 export default PageSub
