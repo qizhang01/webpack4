@@ -47,9 +47,10 @@ export default class Index extends React.Component {
         addEmployeeName: '',
         ifSuccessOnce: false,  //是否成功新增至少一名
         userno: '', //员工
-        deparmentName: '',
+        departmentname: '',
         isShowSetDepModel: false,
-        selectedItem: null
+        selectedItem: null,
+        addDepartmentName: ''
     }
 
     columns = [
@@ -63,8 +64,8 @@ export default class Index extends React.Component {
             key:'name'
         },{
             title: '部门',
-            dataIndex: 'deparmentname',
-            key:'deparmentname'
+            dataIndex: 'departmentname',
+            key:'departmentname'
         },
         {
             title: '权限',
@@ -158,7 +159,7 @@ export default class Index extends React.Component {
     }
     
     initDeparment = record => {
-        this.setState({selectedItem: record})
+        this.setState({selectedItem: record, isShowSetDepModel: true})
     }
 
     initSign= async record =>{
@@ -196,13 +197,14 @@ export default class Index extends React.Component {
     }
     
     updateDepartmentName = async ()=>{
+        this.setState({isShowSetDepModel:false})
         const { id} = this.state.selectedItem
-        const res = await fetchAPI('/api/users/updatedepartment',JSON.stringify({id, departmentname: this.state.deparmentName}),"POST")
+        const res = await fetchAPI('/api/users/updatedepartment',JSON.stringify({id, departmentname: this.state.departmentname}),"POST")
         res && this.getAllUsersList()
     }
 
     submitModel=async ()=>{
-        const {userno,addEmployeeName,addRoles} = this.state
+        const {userno,addEmployeeName,addRoles, addDepartmentName} = this.state
         const password = generator.generate({
             length: 10,
             numbers: true
@@ -211,7 +213,8 @@ export default class Index extends React.Component {
             userno,
             name: addEmployeeName,
             password,
-            roles: addRoles.map(item=>objMap[item]).join(',')
+            roles: addRoles.map(item=>objMap[item]).join(','),
+            departmentname: addDepartmentName
         }
         console.log(formData)
         const res = await fetchAPI('/api/users/addaccount',JSON.stringify(formData),"POST")
@@ -260,7 +263,7 @@ export default class Index extends React.Component {
     }
 
     submitDepModel=()=>{
-
+        this.updateDepartmentName()
     }
     onChangeCode=(e)=>{
        this.setState({
@@ -273,7 +276,7 @@ export default class Index extends React.Component {
         })
     }
     onChangeDepName=(e)=>{
-        this.setState({deparmentName: e.target.value})
+        this.setState({departmentname: e.target.value})
     }
     onSelectRoles=(e)=>{
         this.setState({
@@ -286,7 +289,11 @@ export default class Index extends React.Component {
             password: e.target.value
         })
     }
-    
+    onChangeDepartname=(e)=>{
+        this.setState({
+            addDepartmentName: e.target.value
+        })
+    }
     parseTime=(time)=>{
         // 2019-05-03T07:41:32.36Z
         if(!time){
@@ -309,7 +316,9 @@ export default class Index extends React.Component {
         }
         const {employeeList,isShowModel,
             addEmployeeName,addRoles,
-            userno, selectedItem
+            userno, selectedItem,
+            isShowSetDepModel,departmentname,
+            addDepartmentName
         } = this.state
         return (
             <Panel>
@@ -369,6 +378,15 @@ export default class Index extends React.Component {
                             </Input>
                         </Row>
                         <Row>
+                            <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>项目部:</span>
+                            <Input placeholder="项目部"
+                                    onChange={this.onChangeDepartname}
+                                    style={{ width: 200,marginLeft: 10,marginBottom: 10  }}
+                                    value={addDepartmentName}
+                                >
+                            </Input>
+                        </Row>
+                        <Row>
                             <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>设置权限:</span>
                             <CheckboxGroup
                                 disabled={!addEmployeeName}
@@ -389,20 +407,20 @@ export default class Index extends React.Component {
                             <Button key="close" onClick={this.cancelDepModel}>
                                关闭
                             </Button>,
-                            <Button key="submit" disabled = {!deparmentName} type="primary"  onClick={this.submitDepModel}>
+                            <Button key="submit" disabled = {!departmentname} type="primary"  onClick={this.submitDepModel}>
                                确定
                             </Button>,
                         ]}
                     >
-                        <Row>
+                        {/* <Row>
                             <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>姓名: {selectedItem.name}</span>
-                        </Row>
+                        </Row> */}
                         <Row>
                             <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>项目部名称:</span>
                             <Input placeholder="请输入项目部名称"
                                     onChange={this.onChangeDepName}
                                     style={{ width: 200,marginLeft: 10,marginBottom: 10  }}
-                                    value={deparmentName}
+                                    value={departmentname}
                                 >
                             </Input>
                         </Row>

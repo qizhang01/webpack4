@@ -51,24 +51,48 @@ const PageSub= () => {
     const [nowsalary, setNowsalary] = useState(null)
     const info = window.localStorage.getItem(AUTH_KEY)
     const departmentname = info ? JSON.parse(info).departmentname : ''
+    
+    const [method, setMethod] = useState('入职')
 
     useEffect(() => {
         fetchEmployee()
     }, [])
-    const fetchEmployee = () => {}
+
+    const fetchEmployee = () => {
+
+    }
+
     const onFinish = async (values) => {
-        if (key == 1) {
-            console.log(key)
-            const { type, name, departmentname } = values
-            const submitname = info ? JSON.parse(info).name : ''
-            // submitonoroff
-            const body = {
-                type,
-                name,
-                departmentname,
-                submitname,
+        if (key == 1) { 
+            let result;
+            if(method=='入职'){
+                const { type, name, departmentname, identityid, tel, emergency, emergencytel } = values
+                const submitname = info ? JSON.parse(info).name : ''
+                // submitonoroff
+                const body = {
+                    type,
+                    name,
+                    departmentname,
+                    submitname,
+                    identityid,
+                    tel,
+                    emergency,
+                    emergencytel
+                } 
+                result = await fetchApi('api/submitonwork', JSON.stringify(body), 'POST')                                 
+            }else{
+                const { type, name, departmentname, identityid } = values
+                const submitname = info ? JSON.parse(info).name : ''
+                const body = {
+                    type,
+                    name,
+                    departmentname,
+                    submitname,
+                    identityid
+                } 
+                result = await fetchApi('api/submitoffwork', JSON.stringify(body), 'POST')
             }
-            const result = await fetchApi('api/submitonoroff', JSON.stringify(body), 'POST')
+
             if (result.code == '200') {
                 message.info('申请成功')
             } else {
@@ -94,63 +118,8 @@ const PageSub= () => {
     const onChange = (key) => {
         setkey(key)
     }
-
-    React.useEffect(() => {
-        if(document.getElementById('importdepart')){           
-            document.getElementById('importdepart')?.addEventListener('change', e => {
-                inputHander(e)
-            })
-            return document.getElementById('importdepart')?.removeEventListener('change', inputHander)
-        }   
-    })
     
-    const inputHander = (e) => {
-        let data,
-            workbook,
-            items = [],
-            lastJson={}
-        const files = e.target.files
-        if (!/\.(xlsx|xls)$/.test(files[0].name)) {
-            return alert('文件类型不正确')
-        }
-        let fileReader = new FileReader()
-
-        // // 以二进制方式打开文件
-        fileReader.readAsBinaryString(files[0])
-
-        fileReader.onload = async function(ev) {
-            try {
-                data = ev.target?.result
-                workbook = XLSX.read(data, {
-                    type: 'binary',
-                }) // 以二进制流方式读取得到整份excel表格对象
-            } catch {
-                return alert('文件有错误，请重新编辑后导入')
-            }
-
-            // // 遍历每张表读取
-            for (let sheet in workbook.Sheets) {
-                if (workbook.Sheets[sheet]) {
-                    items = items.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]))
-                    // break; // 如果只取第一张表，就取消注释这行
-                }
-            }
-            items.map((el, index) => {
-                const id = el["员工编号"]
-                const departmentname = el["所在现场"]
-                // const identityid = el["身份证号"]
-                // const period = el["入职时间"]
-                // const telephone = el["联系电话"]
-                lastJson[id]= departmentname
-            }) 
-            const result = await fetchApi(
-                'api/salary/updatedepartment',
-                JSON.stringify(lastJson),
-                'POST'
-            )
-        }
-    }
-    const selectMethod = () => {}
+    const selectMethod = (value) => {setMethod(value)}
     const selectDepartment = () => {}
     const selectSalaryType = () => {}
     const handleClick = () => {}
@@ -179,19 +148,52 @@ const PageSub= () => {
                         >
                             <Input placeholder="请输入姓名" style={{ width: 280 }} />
                         </Form.Item>
-
                         <Form.Item
-                            name="departmentname"
-                            label="项目部"
-                            rules={[{ required: true, message: '必须输入项目部' }]}
+                            name="identityid"
+                            label="身份证号"
+                            rules={[{ required: true, message: '必须输入身份证号' }]}
                         >
-                            <Input
-                                placeholder="请输入姓名"
-                                style={{ width: 280 }}
-                                defaultValue={departmentname}
-                            />
+                            <Input placeholder="请输入身份证号" style={{ width: 280 }} />
                         </Form.Item>
 
+                        {method!="离职" && 
+                            <Form.Item
+                                name="tel"
+                                label="联系方式"
+                                rules={[{ required: true, message: '必须输入联系方式' }]}
+                            >
+                                <Input placeholder="请输入联系方式" style={{ width: 280 }} />
+                            </Form.Item>
+                        }
+                        {method!="离职" && 
+                            <Form.Item
+                                name="emergency"
+                                label="紧急联系人"
+                            >
+                                <Input placeholder="请输入紧急联系人" style={{ width: 280 }} />
+                            </Form.Item>
+                        }
+                        {method!="离职" && 
+                            <Form.Item
+                                name="emergencytel"
+                                label="紧急联系方式"
+                            >
+                                <Input placeholder="请输入紧急联系方式" style={{ width: 280 }} />
+                            </Form.Item>
+                        }
+                        {method!="离职" && 
+                            <Form.Item
+                                name="departmentname"
+                                label="项目部"
+                                rules={[{ required: true, message: '必须输入项目部' }]}
+                            >
+                                <Input
+                                    placeholder="请输入项目部"
+                                    style={{ width: 280 }}
+                                    defaultValue={departmentname}
+                                />
+                            </Form.Item>
+                        }
                         <div style={{ marginTop: 30, marginBottom: 10 }}>
                             <Form.Item wrapperCol={{ span: 3, offset: 9 }}>
                                 <Button type="primary" htmlType="submit" block>
@@ -199,18 +201,6 @@ const PageSub= () => {
                                 </Button>
                             </Form.Item>
                         </div>
-                        <label
-                            className="ant-btn ant-btn-primary"
-                            style={{
-                                width: '160px',
-                                marginBottom: 6,
-                                marginLeft: 6,
-                                marginRight: 60
-                            }}
-                        >
-                            <UploadOutlined /> 导入excel文件
-                            <input id="importdepart" type="file" style={{ display: 'none' }} />
-                        </label>
                     </Form>
                 </Collapse.Panel>
                 <Collapse.Panel header="加班申请" key="2">
