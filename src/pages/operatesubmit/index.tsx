@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Form,
     Select,
@@ -32,12 +32,14 @@ const PageSub: React.FC = () => {
     const emptylist: any[] = []
     const [totalTableData, setTotalTableData] = React.useState([])
     const [tableData, setTableData] = useState(emptylist)
+    const [addsalarytableData, setAddSalaryTableData] = useState(emptylist)
+    const [overworktableData, setOverworkTableData] = useState(emptylist)
     const [buttonkey, setButtonkey] = useState(1)
     const columns = [
         {
             title: '申请类型',
-            dataIndex: 'offertype',
-            key: 'offertype',
+            dataIndex: 'type',
+            key: 'type',
         },
         {
             title: '姓名',
@@ -54,9 +56,6 @@ const PageSub: React.FC = () => {
             title: '申请时间',
             dataIndex: 'createtime',
             key: 'createtime',
-            render(text: string, record: any) {
-                return <span></span>
-            },
         },
         {
             title: '申请人',
@@ -95,8 +94,8 @@ const PageSub: React.FC = () => {
     const columnsoverwork = [
         {
             title: '申请类型',
-            dataIndex: 'offertype',
-            key: 'offertype',
+            dataIndex: 'type',
+            key: 'type',
         },
         {
             title: '姓名',
@@ -118,9 +117,6 @@ const PageSub: React.FC = () => {
             title: '申请时间',
             dataIndex: 'createtime',
             key: 'createtime',
-            render(text: string, record: any) {
-                return <span></span>
-            },
         },
         {
             title: '申请人',
@@ -159,8 +155,8 @@ const PageSub: React.FC = () => {
     const columnsaddsalary = [
         {
             title: '申请类型',
-            dataIndex: 'offertype',
-            key: 'offertype',
+            dataIndex: 'type',
+            key: 'type',
         },
         {
             title: '姓名',
@@ -225,6 +221,15 @@ const PageSub: React.FC = () => {
             ),
         },
     ]
+    useEffect(()=>{
+        if(buttonkey==1){
+            query()
+        }else if(buttonkey==2){
+            queryForOvertimework()
+        }else if(buttonkey==3){
+            queryAddSalary()
+        }
+    },[buttonkey])
     const agree =async (record:any)=>{
         const {salarytype, name, employeeid}=record
         const body = {
@@ -279,8 +284,7 @@ const PageSub: React.FC = () => {
         const result = await fetchApi('api/applyforaddsalarystatus')
         if (result.code == '200') {
             const d = result.data
-            setTableData(d)
-            setTotalTableData(d)
+            setAddSalaryTableData(d)
         } else {
             message.info('查询失败, 请重新提交')
         }
@@ -291,8 +295,7 @@ const PageSub: React.FC = () => {
         const result = await fetchApi('api/applyforovertimeworkstatus')
         if (result.code == '200') {
             const d = result.data
-            setTableData(d)
-            setTotalTableData(d)
+            setOverworkTableData(d)
         } else {
             message.info('查询失败, 请重新提交')
         }
@@ -309,8 +312,8 @@ const PageSub: React.FC = () => {
             <Button style={{marginLeft: 30}} type={buttonkey==2?"primary":"default"} onClick={()=>handleButtonClick(2)}>加班申请</Button > 
             <Button style={{marginLeft: 30}} type={buttonkey==3?"primary":"default"} onClick={()=>handleButtonClick(3)}>加薪申请</Button>
             {buttonkey==1 &&<Table dataSource={tableData} columns={columns} size="small" id="operate-submit-table"/>}
-            {buttonkey==2 &&<Table dataSource={tableData} columns={columnsoverwork} size="small" id="operate-submit-table"/>}
-            {buttonkey==3 &&<Table dataSource={tableData} columns={columnsaddsalary} size="small" id="operate-submit-table"/>}
+            {buttonkey==2 &&<Table dataSource={overworktableData} columns={columnsoverwork} size="small" id="operate-submit-table"/>}
+            {buttonkey==3 &&<Table dataSource={addsalarytableData} columns={columnsaddsalary} size="small" id="operate-submit-table"/>}
         </Panel>
     )
 }

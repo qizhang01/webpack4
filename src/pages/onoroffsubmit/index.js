@@ -50,7 +50,7 @@ const PageSub= () => {
     const [overtimeworklist, setOvertimeWorklist] = useState([])
     const [nowsalary, setNowsalary] = useState(null)
     const info = window.localStorage.getItem(AUTH_KEY)
-    const departmentname = info ? JSON.parse(info).departmentname : ''
+    const defaultdepartmentname = info ? JSON.parse(info).departmentname : ''
     
     const [method, setMethod] = useState('入职')
 
@@ -66,13 +66,13 @@ const PageSub= () => {
         if (key == 1) { 
             let result;
             if(method=='入职'){
-                const { type, name, departmentname, identityid, tel, emergency, emergencytel } = values
+                const {  departmentname, identityid, tel, emergency, emergencytel } = values
                 const submitname = info ? JSON.parse(info).name : ''
                 // submitonoroff
                 const body = {
-                    type,
-                    name,
-                    departmentname,
+                    type: method,
+                    name: values.name,
+                    departmentname: departmentname? departmentname: defaultdepartmentname,
                     submitname,
                     identityid,
                     tel,
@@ -81,12 +81,12 @@ const PageSub= () => {
                 } 
                 result = await fetchApi('api/submitonwork', JSON.stringify(body), 'POST')                                 
             }else{
-                const { type, name, departmentname, identityid } = values
+                const {  name, departmentname, identityid } = values
                 const submitname = info ? JSON.parse(info).name : ''
                 const body = {
-                    type,
-                    name,
-                    departmentname,
+                    type: method,
+                    name: values.name,
+                    departmentname: departmentname? departmentname: defaultdepartmentname,
                     submitname,
                     identityid
                 } 
@@ -181,19 +181,17 @@ const PageSub= () => {
                                 <Input placeholder="请输入紧急联系方式" style={{ width: 280 }} />
                             </Form.Item>
                         }
-                        {method!="离职" && 
-                            <Form.Item
-                                name="departmentname"
-                                label="项目部"
-                                rules={[{ required: true, message: '必须输入项目部' }]}
-                            >
-                                <Input
-                                    placeholder="请输入项目部"
-                                    style={{ width: 280 }}
-                                    defaultValue={departmentname}
-                                />
-                            </Form.Item>
-                        }
+                        <Form.Item
+                            name="departmentname"
+                            label="项目部"
+                        >
+                            <Input
+                                placeholder="请输入项目部"
+                                style={{ width: 280 }}
+                                defaultValue={defaultdepartmentname}
+                            />
+                        </Form.Item>
+                        
                         <div style={{ marginTop: 30, marginBottom: 10 }}>
                             <Form.Item wrapperCol={{ span: 3, offset: 9 }}>
                                 <Button type="primary" htmlType="submit" block>
@@ -234,12 +232,14 @@ const PageSub= () => {
                             style={{ width: 280, marginBottom: 20 }}
                             onChange={onRangeChange}
                         />
+                        <div>
                         加班原因:
                         <input
                             placeholder="请输入姓名"
-                            style={{ width: 280 }}
+                            style={{ width: 280 ,marginLeft: 20,marginTop: 20}}
                             onChange={handleInput}
                         />
+                        </div>
                     </div>
                     <div
                         style={{
