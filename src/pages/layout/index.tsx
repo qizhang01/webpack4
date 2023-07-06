@@ -2,7 +2,7 @@ import * as React from 'react'
 import { withRouter, Link, useHistory } from 'react-router-dom'
 import { Layout, Menu, Button, Dropdown, Avatar, Modal, Row, Input } from 'antd'
 import { RenderRoutes } from '@/router/RenderRoutes'
-import { IMenuNav, menuNav, permission, submitflow } from '@/pages/layout/menu'
+import { IMenuNav, menuNav, permission, submitflow, employeeinfo } from '@/pages/layout/menu'
 import Logo from '@/assets/images/logo.jpg'
 import { Auth } from '@/auth'
 import { routeProps } from '@/types/route'
@@ -25,7 +25,7 @@ const AppLayout: React.FC<routeProps> = (routeProps: routeProps) => {
     const info =
         window.localStorage.getItem('xx-auth-key') &&
         JSON.parse(window.localStorage.getItem('xx-auth-key') as string).roles.includes('ADMIN')
-    let navItem = [...menuNav, submitflow]
+    let navItem = [...menuNav, submitflow, employeeinfo]
     if (info) {
         navItem.push(permission)
     }

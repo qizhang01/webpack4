@@ -55,6 +55,16 @@ export const permission = {
             title: '员工成绩',
             uri: '/root/score',
         },
+    ],
+}
+export const employeeinfo = {
+    title: '员工信息',
+    show: true,
+    children: [
+        {
+            title: '部门员工',
+            uri: '/root/employee',
+        },
         {
             title: '员工薪水',
             uri: '/root/salary',
