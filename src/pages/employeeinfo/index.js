@@ -95,6 +95,11 @@ const PageSub = () => {
             dataIndex: 'relationship2',
             key: 'relationship2',
         },
+        {
+            title: '备注',
+            dataIndex: 'status',
+            key: 'status',
+        },
     ]
 
     useEffect(() => {

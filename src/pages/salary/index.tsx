@@ -211,7 +211,6 @@ const PageSub: React.FC = () => {
             const month = new Date().getMonth() + 1
             let monthStr = month.toString()
             if(month<10) monthStr = `0${monthStr}`
-            debugger
             // const content = XLSX.utils.table_to_book(document.getElementById('salary-table'))
             const topic = ['结算方式','姓名','员工id','日薪/月薪','加班时薪','中班补贴','晚班补贴','餐补','本月薪水','工龄']
             const d = tableData.map(item => [item.salarytype, item.name, item.employeeid, item.salaryday,
@@ -300,7 +299,11 @@ const PageSub: React.FC = () => {
     }
     
     const query = async () => {
-        const result = await fetchApi('api/salary/getallemployeesalary')
+        const cache = localStorage.getItem('xx-auth-key')
+        ? JSON.parse(localStorage.getItem('xx-auth-key')||"")
+        : null
+        const {roles, departmentname} = cache.roles
+        const result = await fetchApi('api/salary/getallemployeesalary',JSON.stringify({roles, departmentname}), "POST")
         if (result.code == '200') {
             const d = result.data
             setTableData(d)
@@ -310,7 +313,6 @@ const PageSub: React.FC = () => {
         }
     }
     const onChange = (key: any) => {
-        console.log(key)
         if (key == 2) {
             query()
         }

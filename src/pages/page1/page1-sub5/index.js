@@ -23,17 +23,21 @@ const style={
          wrapperCol:{span:20}
     }
 }
-const options = ['管理员', '用户', '测验'];
+const options = ['管理员', '用户', '测验', '营运', 'HR'];
 const obj ={
     "ADMIN":'管理员',
     "USER": '用户',
-    "TEST": '测验'
+    "TEST": '测验',
+    'OPERATE': '营运',
+    'HR':'HR'
 }
 
 const objMap ={
     "管理员":'ADMIN',
     "用户": 'USER',
-    "测验": 'TEST'
+    "测验": 'TEST',
+    '营运': 'OPERATE',
+    'HR':'HR'
 }
 export default class Index extends React.Component {
     constructor(props) {

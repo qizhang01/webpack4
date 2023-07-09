@@ -48,18 +48,29 @@ const PageSub= () => {
     const [key, setkey] = useState(1)
     const [employeelist, setEmployeeList] = useState([])
     const [overtimeworklist, setOvertimeWorklist] = useState([])
-    const [nowsalary, setNowsalary] = useState(null)
+    const [nowsalarytip, setNowsalaryTip] = useState(null)
     const info = window.localStorage.getItem(AUTH_KEY)
     const defaultdepartmentname = info ? JSON.parse(info).departmentname : ''
-    
+
+    const overworkreason = "" //加班理由
+    const startoverworktime =""
+    const endoverworktime = ""
+    const nowsalary = 0
     const [method, setMethod] = useState('入职')
 
     useEffect(() => {
         fetchEmployee()
     }, [])
 
-    const fetchEmployee = () => {
-
+    const fetchEmployee = async () => {
+        const {roles, departmentname} = JSON.parse(localStorage.getItem("xx-auth-key"))
+        const result = await fetchApi('api/applyallemployee', JSON.stringify({roles, departmentname}),'POST')
+        if (result.code == '200') {
+            const d = result.data
+            setEmployeeList(d)
+        } else {
+            message.info('查询失败, 请重新提交')
+        }
     }
 
     const onFinish = async (values) => {
@@ -99,14 +110,19 @@ const PageSub= () => {
                 message.info('申请失败, 请重新提交')
             }
         } else if (key == 3) {
-            const { name, salarytype, expectedsalary } = values
+            const { employeeid, salarytype="日薪", expectedsalary } = values
+            const {name, departmentname} = JSON.parse(localStorage.getItem("xx-auth-key"))
+            const filterItem = employeelist.filter(item=>item.employeeid == employeeid)
             const body = {
-                name,
+                employeeid,
                 salarytype,
                 nowsalary,
                 expectedsalary,
+                departmentname: filterItem[0].departmentname,
+                submitname: name,
+                name: filterItem[0].name
             }
-            const result = await fetchApi('api/submitaddsalary', JSON.stringify(body), 'POST')
+            const result = await fetchApi('api/salary/submitaddsalary', JSON.stringify(body), 'POST')
             if (result.code == '200') {
                 message.info('申请成功')
             } else {
@@ -120,12 +136,62 @@ const PageSub= () => {
     }
     
     const selectMethod = (value) => {setMethod(value)}
-    const selectDepartment = () => {}
-    const selectSalaryType = () => {}
-    const handleClick = () => {}
-    const handleClose = (index) => {}
-    const onRangeChange = (dates, dateStrings) => {}
-    const handleInput = (v) => {}
+
+    const selectDepartment = (value) => {
+        const filterItem = employeelist.filter(item=>item.identityid == value)
+        if(overtimeworklist.filter(item=>item.identityid==value).length==0){
+            const newlist = [
+                ...overtimeworklist,
+                filterItem[0]
+            ]
+            setOvertimeWorklist(newlist)
+        }
+    }
+
+    const handleSelectOfAddsalary = async (value) => {
+        const result = await fetchApi('api/salary/getemployeesalarybyid', JSON.stringify({employeeid: value}), 'POST')
+        if (result.code == '200') {
+            if(result.data.length > 0){
+                let data = result.data[0]
+                setNowsalaryTip(`${data.salarytype}-${data.salaryday}`)
+                nowsalary = data.salaryday
+            }
+        } else {
+            message.info('获取员工薪水信息失败')
+        }
+    }
+
+    const handleClick = async () => {
+        const {name, departmentname} = JSON.parse(localStorage.getItem("xx-auth-key"))
+        const body = {
+            overtimeworklist,
+            startoverworktime,
+            endoverworktime,
+            overworkreason,
+            submitname: name,
+            departmentname
+        }
+        const result = await fetchApi('api/submitovertimework', JSON.stringify(body), 'POST')
+        if (result.code == '200') {
+            message.info('申请成功')
+        } else {
+            message.info('申请失败, 请重新提交')
+        }
+    }
+    const handleClose = (identityid) => {
+        const newlist = overtimeworklist.filter(el=>el.identityid!=identityid)
+        setOvertimeWorklist([...newlist])
+    }
+
+    const onRangeChange = (dates, dateStrings) => {
+        startoverworktime = dateStrings[0]
+        endoverworktime = dateStrings[1]
+    }
+
+    const handleInput = (v) => {
+        overworkreason = v.target.value
+    }
+
     return (
         <Panel>
             <Collapse onChange={onChange} accordion>
@@ -209,8 +275,8 @@ const PageSub= () => {
                             onChange={selectDepartment}
                         >
                             {employeelist.map(item => (
-                                <Option value={item.name} key={item.id}>
-                                    {item.name}
+                                <Option value={item.identityid} key={item.id}>
+                                    {`${item.name}  ${item.identityid.substring(13)}`}
                                 </Option>
                             ))}
                         </Select>
@@ -219,9 +285,9 @@ const PageSub= () => {
                                 {overtimeworklist.map((item) => (
                                     <Tag
                                         color="gold"
-                                        key={item.id}
+                                        key={item.identityid}
                                         closable
-                                        onClose={item => handleClose(item)}
+                                        onClose={() => handleClose(item.identityid)}
                                     >
                                         {item.name}
                                     </Tag>
@@ -234,8 +300,8 @@ const PageSub= () => {
                         />
                         <div>
                         加班原因:
-                        <input
-                            placeholder="请输入姓名"
+                        <Input
+                            placeholder="请输入加班原因"
                             style={{ width: 280 ,marginLeft: 20,marginTop: 20}}
                             onChange={handleInput}
                         />
@@ -256,21 +322,30 @@ const PageSub= () => {
                 </Collapse.Panel>
                 <Collapse.Panel header="调薪申请" key="3">
                     <Form name="config-form-salary" {...formItemLayout} onFinish={onFinish}>
-                        <Form.Item name="name" label="姓名">
-                            <Input placeholder="请输入员工姓名" style={{ width: 280 }} />
+                        <Form.Item name="employeeid" label="姓名">
+                            <Select
+                                placeholder="请选择员工姓名"
+                                style={{ width: 280, display: 'block' }}
+                                onChange ={handleSelectOfAddsalary}
+                            >
+                                {employeelist.map(item => (
+                                    <Option value={item.employeeid} key={item.id}>
+                                        {`${item.name}  ${item.identityid.substring(13)}`}
+                                    </Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Form.Item name="salarytype" label="日薪/月薪">
                             <Select
                                 defaultValue="日薪"
                                 style={{ width: 180 }}
-                                onChange={selectSalaryType}
                             >
                                 <Option value="日薪">日薪</Option>
                                 <Option value="月薪">月薪</Option>
                             </Select>
                         </Form.Item>
                         <Form.Item name="nowsalary" label="当前薪水">
-                            <span>{nowsalary}</span>
+                            <span>{nowsalarytip}</span>
                         </Form.Item>
                         <Form.Item
                             name="expectedsalary"
