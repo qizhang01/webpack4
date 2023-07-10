@@ -92,15 +92,16 @@ const PageSub= () => {
                 } 
                 result = await fetchApi('api/submitonwork', JSON.stringify(body), 'POST')                                 
             }else{
-                const {  name, departmentname, identityid } = values
+                const identityid = values.identityid
                 const submitname = info ? JSON.parse(info).name : ''
+                const filteritem = employeelist.filter(item=>item.identityid==identityid)
                 const body = {
                     type: method,
-                    name: values.name,
-                    departmentname: departmentname? departmentname: defaultdepartmentname,
+                    name: filteritem[0].name,
+                    departmentname: defaultdepartmentname,
                     submitname,
                     identityid
-                } 
+                }
                 result = await fetchApi('api/submitoffwork', JSON.stringify(body), 'POST')
             }
 
@@ -207,22 +208,23 @@ const PageSub= () => {
                                 <Option value="离职">离职</Option>
                             </Select>
                         </Form.Item>
-                        <Form.Item
-                            name="name"
-                            label="姓名"
-                            rules={[{ required: true, message: '必须输入姓名' }]}
-                        >
-                            <Input placeholder="请输入姓名" style={{ width: 280 }} />
-                        </Form.Item>
-                        <Form.Item
-                            name="identityid"
-                            label="身份证号"
-                            rules={[{ required: true, message: '必须输入身份证号' }]}
-                        >
-                            <Input placeholder="请输入身份证号" style={{ width: 280 }} />
-                        </Form.Item>
 
-                        {method!="离职" && 
+                        {method!="离职" ?
+                        <>
+                            <Form.Item
+                                name="name"
+                                label="姓名"
+                                rules={[{ required: true, message: '必须输入姓名' }]}
+                            >
+                                <Input placeholder="请输入姓名" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="identityid"
+                                label="身份证号"
+                                rules={[{ required: true, message: '必须输入身份证号' }]}
+                            >
+                                <Input placeholder="请输入身份证号" style={{ width: 280 }} />
+                            </Form.Item>
                             <Form.Item
                                 name="tel"
                                 label="联系方式"
@@ -230,32 +232,43 @@ const PageSub= () => {
                             >
                                 <Input placeholder="请输入联系方式" style={{ width: 280 }} />
                             </Form.Item>
-                        }
-                        {method!="离职" && 
                             <Form.Item
                                 name="emergency"
                                 label="紧急联系人"
                             >
                                 <Input placeholder="请输入紧急联系人" style={{ width: 280 }} />
                             </Form.Item>
-                        }
-                        {method!="离职" && 
                             <Form.Item
                                 name="emergencytel"
                                 label="紧急联系方式"
                             >
                                 <Input placeholder="请输入紧急联系方式" style={{ width: 280 }} />
                             </Form.Item>
+                        </>:
+                        <>
+                            <Form.Item
+                                name="identityid"
+                                label="请选择姓名"
+                            >
+                                <Select
+                                    placeholder="请选择员工姓名"
+                                    style={{ width: 280, display: 'block' }}
+                                >
+                                    {employeelist.map(item => (
+                                        <Option value={item.identityid} key={item.id}>
+                                            {`${item.name}  ${item.identityid.substring(13)}`}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </>
                         }
+     
                         <Form.Item
                             name="departmentname"
                             label="项目部"
                         >
-                            <Input
-                                placeholder="请输入项目部"
-                                style={{ width: 280 }}
-                                defaultValue={defaultdepartmentname}
-                            />
+                            <span>{defaultdepartmentname}</span>
                         </Form.Item>
                         
                         <div style={{ marginTop: 30, marginBottom: 10 }}>

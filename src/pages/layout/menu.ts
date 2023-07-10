@@ -84,9 +84,9 @@ export const submitflow = {
             title: '营运审批',
             uri: '/root/operatesubmit',
         },
-        {
-            title: '人事告知',
-            uri: '/root/hrsubmit',
-        },
+        // {
+        //     title: '人事告知',
+        //     uri: '/root/hrsubmit',
+        // },
     ],
 }

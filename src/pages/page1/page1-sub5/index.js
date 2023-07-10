@@ -326,7 +326,7 @@ export default class Index extends React.Component {
         } = this.state
         return (
             <Panel>
-                <div className='sale-record_content' style={{height: "100%",background: "#ffff",minWidth:1140, paddingRight:5,overflow:'hidden'}}>
+                <div className='sale-record_content' style={{height: "100%",background: "#ffff",minWidth:1140, paddingRight:5}}>
                     <Button
                         type ='primary'
                         style={{marginLeft: 5, marginBottom: 10}}
