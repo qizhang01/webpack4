@@ -44,6 +44,10 @@ const PageSub: React.FC = () => {
     const [salaryworkovertime, setSalaryworkovertime] = React.useState('')
     const [salaryLabel, setSalaryLabel] = React.useState('日薪')
     const [foodpayday, setFoodpayday] = React.useState('') //餐补
+    const cache = localStorage.getItem('xx-auth-key')
+        ? JSON.parse(localStorage.getItem('xx-auth-key') || '')
+        : null
+    const roles = cache.roles
     const columns = [
         {
             title: '结算方式',
@@ -117,17 +121,21 @@ const PageSub: React.FC = () => {
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
-                <span>
-                    <a href="javascript:;" onClick={() => reset(record)}>
-                        调薪
-                    </a>
-                    <Divider type="vertical"/>
-                    <Popconfirm title="确定删除?" onConfirm={() => handleDelete(record)}>
-                        <a>删除</a>
-                    </Popconfirm>
-                </span>
-            ),
+            render: (text: any, record: any) =>{
+                if(roles.includes('HR')|| roles.includes('ADMIN')){
+                    return (
+                        <span>
+                            <a href="javascript:;" onClick={() => reset(record)}>
+                                调薪
+                            </a>
+                            <Divider type="vertical"/>
+                            <Popconfirm title="确定删除?" onConfirm={() => handleDelete(record)}>
+                                <a>删除</a>
+                            </Popconfirm>
+                        </span>
+                    )
+                }
+            },
         },
     ]
     const onSearch =(v:String)=>{
@@ -172,7 +180,7 @@ const PageSub: React.FC = () => {
                 foodpayday
             }
             path = 'savesimpleday'
-        } else if (salarytype === '按比例核定') {
+        } else if (salarytype === '月结') {
             const {
                 name,
                 employeeid,
@@ -302,7 +310,7 @@ const PageSub: React.FC = () => {
         const cache = localStorage.getItem('xx-auth-key')
         ? JSON.parse(localStorage.getItem('xx-auth-key')||"")
         : null
-        const {roles, departmentname} = cache.roles
+        const {roles, departmentname} = cache
         const result = await fetchApi('api/salary/getallemployeesalary',JSON.stringify({roles, departmentname}), "POST")
         if (result.code == '200') {
             const d = result.data
@@ -438,8 +446,7 @@ const PageSub: React.FC = () => {
                                 onChange={selectMethod}
                             >
                                 <Option value="日结">日结</Option>
-                                {/* <Option value="月结">月结</Option> */}
-                                <Option value="按比例核定">月结-按比例核定</Option>
+                                <Option value="月结">月结</Option>
                             </Select>
                         </Form.Item>
                         <Form.Item

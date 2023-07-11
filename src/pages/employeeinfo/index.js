@@ -38,6 +38,10 @@ const PageSub = () => {
             title: '出生日期',
             dataIndex: 'borntime',
             key: 'borntime',
+            render(text, record) {
+                const identityid = record.identityid
+                return `${identityid.substr(6,4)}/${identityid.substr(10,2)}/${identityid.substr(12,2)}`
+            }
         },
         {
             title: '性别',
@@ -99,6 +103,25 @@ const PageSub = () => {
             title: '备注',
             dataIndex: 'status',
             key: 'status',
+            render(text, record) {
+                let content = ""
+                if(text==1){
+                    content ="入职中"
+                }else if(text==2){
+                    content ="在职"
+                }else if(text==3){
+                    content ="离职中"
+                }else if(text==4){
+                    content ="离职"
+                }
+                return (
+                    <span>
+                        <a href="javascript:;">
+                            {content}
+                        </a>
+                    </span>
+                )
+            },
         },
     ]
 

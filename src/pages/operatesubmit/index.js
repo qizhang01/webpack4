@@ -89,11 +89,11 @@ const PageSub = () => {
                         </span>
                     )
                 }
-                if(roles.includes('HR')){
+                if(roles.includes('HR') && record.operatestatus){
                     return (
                         <span>
                             <a href="javascript:;" onClick={() => knowledged(record,1)}>
-                                未处理
+                                现在处理
                             </a>
                         </span>
                     )
@@ -172,11 +172,11 @@ const PageSub = () => {
                         </span>
                     )
                 }
-                if(roles.includes('HR')){
+                if(roles.includes('HR') && record.operatestatus){
                     return (
                         <span>
                             <a href="javascript:;" onClick={() => knowledged(record,2)}>
-                                未处理
+                                现在处理
                             </a>
                         </span>
                     )
@@ -262,11 +262,11 @@ const PageSub = () => {
                         </span>
                     )
                 }
-                if(roles.includes('HR')){
+                if(roles.includes('HR') && record.operatestatus){
                     return (
                         <span>
                             <a href="javascript:;" onClick={() => knowledged(record,3)}>
-                                未处理
+                                现在处理
                             </a>
                         </span>
                     )
@@ -294,8 +294,9 @@ const PageSub = () => {
         }
     }
     const agree =async (record, type)=>{
-        const {id }=record
-        const result = await fetchApi(`api/submitoperate`, JSON.stringify({type, id, operatestatus: 'Y'}), 'POST')
+        const {id,identityid }=record
+        const transactiontype = record.type
+        const result = await fetchApi(`api/submitoperate`, JSON.stringify({type, id, identityid, transactiontype, operatestatus: 'Y'}), 'POST')
         if (result.code == '200') {
             refresh(type)
         } else {
@@ -313,8 +314,8 @@ const PageSub = () => {
     }
 
     const reject = async (record, type)=>{
-        const { id }=record
-        const result = await fetchApi(`api/submitoperate`, JSON.stringify({type, id, operatestatus: 'N'}), 'POST')
+        const { id, identityid }=record
+        const result = await fetchApi(`api/submitoperate`, JSON.stringify({type, id, identityid, operatestatus: 'N'}), 'POST')
         if (result.code == '200') {
             message.info(`删除成功`)
             refresh(type)

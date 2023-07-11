@@ -232,3 +232,4 @@ CREATE TABLE `employeeinfo` (
   UNIQUE (`employeeid`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='员工信息表';
+ALTER TABLE `employeeinfo` ADD COLUMN `status` int(1) DEFAULT NULL COMMENT '在职状态' AFTER `relationship2`;

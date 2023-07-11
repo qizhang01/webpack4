@@ -10,11 +10,10 @@ import {
     message,
     Space,
     Tag,
-    TimePicker,
-    Row,
+    DatePicker,
     Tabs,
 } from 'antd'
-import { UploadOutlined, InboxOutlined } from '@ant-design/icons'
+import moment from 'moment';
 import { Panel } from '@/components/Panel'
 import './index.less'
 import { Auth, AUTH_KEY } from '@/auth'
@@ -77,7 +76,15 @@ const PageSub= () => {
         if (key == 1) { 
             let result;
             if(method=='入职'){
-                const {  departmentname, identityid, tel, emergency, emergencytel } = values
+                const { 
+                    departmentname, identityid, tel, 
+                    emergency1, emergencytel1, relationship1,
+                    emergency2="", emergencytel2 ="", relationship2="",
+                    position="", station="", gender, startworktime
+                } = values
+                if(identityid.length!==18 || identityid.length!==16) {
+                    return message.info('身份证位数不正确, 请重新输入')
+                }
                 const submitname = info ? JSON.parse(info).name : ''
                 // submitonoroff
                 const body = {
@@ -86,9 +93,17 @@ const PageSub= () => {
                     departmentname: departmentname? departmentname: defaultdepartmentname,
                     submitname,
                     identityid,
+                    gender,
                     tel,
-                    emergency,
-                    emergencytel
+                    emergency1,
+                    emergencytel1,
+                    relationship1,
+                    emergency2,
+                    emergencytel2,
+                    relationship2,
+                    position,
+                    startworktime: onTimeChangeNohour(startworktime),
+                    station
                 } 
                 result = await fetchApi('api/submitonwork', JSON.stringify(body), 'POST')                                 
             }else{
@@ -107,6 +122,24 @@ const PageSub= () => {
 
             if (result.code == '200') {
                 message.info('申请成功')
+            } else {
+                message.info('申请失败, 请重新提交')
+            }
+        } else if(key==2){
+            const { time, reason } = values
+            const {name, departmentname} = JSON.parse(localStorage.getItem("xx-auth-key"))
+            const body = {
+                overtimeworklist,
+                startoverworktime: onTimeChange(time[0]),
+                endoverworktime: onTimeChange(time[1]),
+                overworkreason: reason,
+                submitname: name,
+                departmentname
+            }
+            const result = await fetchApi('api/submitovertimework', JSON.stringify(body), 'POST')
+            if (result.code == '200') {
+                message.info('申请成功')
+                setOvertimeWorklist([])
             } else {
                 message.info('申请失败, 请重新提交')
             }
@@ -154,7 +187,11 @@ const PageSub= () => {
         if (result.code == '200') {
             if(result.data.length > 0){
                 let data = result.data[0]
-                setNowsalaryTip(`${data.salarytype}-${data.salaryday}`)
+                if(data.salarytype=="按比例核定"){
+                    setNowsalaryTip(`月薪-${data.salaryday}`)
+                }else{
+                    setNowsalaryTip(`${data.salarytype}-${data.salaryday}`)
+                }
                 nowsalary = data.salaryday
             }
         } else {
@@ -184,13 +221,16 @@ const PageSub= () => {
         setOvertimeWorklist([...newlist])
     }
 
-    const onRangeChange = (dates, dateStrings) => {
-        startoverworktime = dateStrings[0]
-        endoverworktime = dateStrings[1]
+    const onTimeChange = ( dateStrings) => {
+        const date = new Date(dateStrings);
+        const minutes = date.getMinutes()<10 ? `0${date.getMinutes()}`: date.getMinutes()
+        return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + ':' 
+            + minutes
     }
 
-    const handleInput = (v) => {
-        overworkreason = v.target.value
+    const onTimeChangeNohour = (dateStrings) => {
+        const date = new Date(dateStrings);
+        return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
     }
 
     return (
@@ -219,11 +259,33 @@ const PageSub= () => {
                                 <Input placeholder="请输入姓名" style={{ width: 280 }} />
                             </Form.Item>
                             <Form.Item
+                                name="gender"
+                                label="性别"
+                                rules={[{ required: true, message: '必须输入性别' }]}
+                            >
+                                <Input placeholder="请输入性别" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
                                 name="identityid"
                                 label="身份证号"
                                 rules={[{ required: true, message: '必须输入身份证号' }]}
                             >
                                 <Input placeholder="请输入身份证号" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="position"
+                                label="职位"
+                            >
+                                <Input placeholder="请输入职位" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="station"
+                                label="岗位"
+                            >
+                                <Input placeholder="请输入岗位" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item name="startworktime" label="入职时间" rules={[{ required: true, message: '必须输入入职时间' }]}>
+                                <DatePicker style={{ width: 280}}/>
                             </Form.Item>
                             <Form.Item
                                 name="tel"
@@ -233,16 +295,40 @@ const PageSub= () => {
                                 <Input placeholder="请输入联系方式" style={{ width: 280 }} />
                             </Form.Item>
                             <Form.Item
-                                name="emergency"
-                                label="紧急联系人"
+                                name="emergency1"
+                                label="紧急联系人1"
                             >
                                 <Input placeholder="请输入紧急联系人" style={{ width: 280 }} />
                             </Form.Item>
                             <Form.Item
-                                name="emergencytel"
-                                label="紧急联系方式"
+                                name="emergencytel1"
+                                label="紧急联系方式1"
                             >
                                 <Input placeholder="请输入紧急联系方式" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="relationship1"
+                                label="关系"
+                            >
+                                <Input placeholder="请输入关系" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="emergency2"
+                                label="紧急联系人2"
+                            >
+                                <Input placeholder="请输入紧急联系人" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="emergencytel2"
+                                label="紧急联系方式2"
+                            >
+                                <Input placeholder="请输入紧急联系方式" style={{ width: 280 }} />
+                            </Form.Item>
+                            <Form.Item
+                                name="relationship2"
+                                label="关系"
+                            >
+                                <Input placeholder="请输入关系" style={{ width: 280 }} />
                             </Form.Item>
                         </>:
                         <>
@@ -281,7 +367,8 @@ const PageSub= () => {
                     </Form>
                 </Collapse.Panel>
                 <Collapse.Panel header="加班申请" key="2">
-                    <div style={{ marginLeft: '16%' }}>
+                    <Form name="config-form-onoroff" {...formItemLayout} onFinish={onFinish}>
+                    <Form.Item label="姓名" rules={[{ required: true, message: '必须选择加班名单' }]}>
                         <Select
                             placeholder="请选择员工姓名"
                             style={{ width: 280, display: 'block' }}
@@ -293,7 +380,8 @@ const PageSub= () => {
                                 </Option>
                             ))}
                         </Select>
-                        <div style={{ marginTop: 20, marginBottom: 20 }}>
+                    </Form.Item> 
+                    <Form.Item label="加班名单">
                             <Space size={[0, 8]} wrap>
                                 {overtimeworklist.map((item) => (
                                     <Tag
@@ -306,32 +394,29 @@ const PageSub= () => {
                                     </Tag>
                                 ))}
                             </Space>
-                        </div>
-                        <TimePicker.RangePicker
-                            style={{ width: 280, marginBottom: 20 }}
-                            onChange={onRangeChange}
-                        />
-                        <div>
-                        加班原因:
-                        <Input
-                            placeholder="请输入加班原因"
-                            style={{ width: 280 ,marginLeft: 20,marginTop: 20}}
-                            onChange={handleInput}
-                        />
-                        </div>
-                    </div>
-                    <div
-                        style={{
-                            marginTop: 30,
-                            marginBottom: 10,
-                            width: '100%',
-                            textAlign: 'center',
-                        }}
-                    >
-                        <Button type="primary" onClick={handleClick}>
-                            完成提交
-                        </Button>
-                    </div>
+                        </Form.Item>
+                        <Form.Item label="加班时间区间" name="time" rules={[{ required: true, message: '必须输入加班日期' }]}>
+                            <DatePicker.RangePicker
+                                showTime={{
+                                    hideDisabledOptions: true,
+                                    defaultValue: [moment('00:00', 'HH:mm'), moment('11:59', 'HH:mm')],
+                                }}
+                                format="YYYY-MM-DD HH:mm"
+                                />
+                        </Form.Item>
+
+                        <Form.Item label="加班原因" name="reason" rules={[{ required: true, message: '必须输入加班原因' }]}>
+                            <Input
+                                placeholder="请输入加班原因"
+                                style={{ width: 280}}
+                             />
+                        </Form.Item>                   
+                        <Form.Item wrapperCol={{ span: 3, offset: 9 }}>
+                            <Button type="primary" htmlType="submit" block>
+                                完成提交
+                            </Button>
+                        </Form.Item>
+                    </Form>
                 </Collapse.Panel>
                 <Collapse.Panel header="调薪申请" key="3">
                     <Form name="config-form-salary" {...formItemLayout} onFinish={onFinish}>
