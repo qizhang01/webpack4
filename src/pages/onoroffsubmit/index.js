@@ -263,7 +263,13 @@ const PageSub= () => {
                                 label="性别"
                                 rules={[{ required: true, message: '必须输入性别' }]}
                             >
-                                <Input placeholder="请输入性别" style={{ width: 280 }} />
+                                <Select
+                                    style={{ width: 280 }}
+                                    placeholder="请选择性别"
+                                >
+                                    <Option value="男">男</Option>
+                                    <Option value="女">女</Option>
+                                </Select>
                             </Form.Item>
                             <Form.Item
                                 name="identityid"

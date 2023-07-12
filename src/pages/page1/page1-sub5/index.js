@@ -10,7 +10,7 @@ import {
     Input,
 } from 'antd';
 import { Panel } from '@/components/Panel'
-import Icon, { PlusOutlined } from '@ant-design/icons';
+import Icon, { PlusOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Auth } from '@/auth'
 import fetchAPI from "@/ajax"
 import generator  from 'generate-password';
@@ -202,8 +202,8 @@ export default class Index extends React.Component {
     
     updateDepartmentName = async ()=>{
         this.setState({isShowSetDepModel:false})
-        const { id} = this.state.selectedItem
-        const res = await fetchAPI('/api/users/updatedepartment',JSON.stringify({id, departmentname: this.state.departmentname}),"POST")
+        const { id, userno} = this.state.selectedItem
+        const res = await fetchAPI('/api/users/updatedepartment',JSON.stringify({id, departmentname: this.state.departmentname, employeeid: userno}),"POST")
         res && this.getAllUsersList()
     }
 

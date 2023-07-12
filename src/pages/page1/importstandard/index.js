@@ -109,7 +109,6 @@ const PageSub2= () => {
                 JSON.stringify({ excelData, userno }),
                 'POST'
             )
-            console.log('22222222222222', result)
             if (result.code == '200') {
                 message.info('提交成功')
                 getStandard()
