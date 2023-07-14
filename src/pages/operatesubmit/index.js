@@ -32,6 +32,12 @@ const PageSub = () => {
             title: '申请类型',
             dataIndex: 'type',
             key: 'type',
+            render: (text, record) => {
+                if(text=="入职") {return <span style={{color: 'green'}}>{text}</span>}
+                else {
+                    return <span style={{color: 'red'}}>{text}</span>
+                }
+            }
         },
         {
             title: '姓名',
@@ -45,9 +51,9 @@ const PageSub = () => {
             key: 'departmentname',
         },
         {
-            title: '申请时间',
-            dataIndex: 'createtime',
-            key: 'createtime',
+            title: '入职/离职时间',
+            dataIndex: 'timepoint',
+            key: 'timepoint',
         },
         {
             title: '申请人',

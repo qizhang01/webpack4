@@ -108,12 +108,14 @@ const PageSub= () => {
                 result = await fetchApi('api/submitonwork', JSON.stringify(body), 'POST')                                 
             }else{
                 const identityid = values.identityid
+                const startworktime = values.startworktime
                 const submitname = info ? JSON.parse(info).name : ''
                 const filteritem = employeelist.filter(item=>item.identityid==identityid)
                 const body = {
                     type: method,
                     name: filteritem[0].name,
                     departmentname: defaultdepartmentname,
+                    startworktime: onTimeChangeNohour(startworktime),
                     submitname,
                     identityid
                 }
@@ -352,6 +354,9 @@ const PageSub= () => {
                                         </Option>
                                     ))}
                                 </Select>
+                            </Form.Item>
+                            <Form.Item name="startworktime" label="离职时间" rules={[{ required: true, message: '必须输入离职时间' }]}>
+                                <DatePicker style={{ width: 280}}/>
                             </Form.Item>
                         </>
                         }

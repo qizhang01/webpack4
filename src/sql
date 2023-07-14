@@ -31,8 +31,7 @@ CREATE TABLE `authlist` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='用户控制表';
 
-ALTER TABLE `authlist` add score varchar(256) DEFAULT NULL COMMENT '测试成绩' AFTER roles;
-ALTER TABLE `authlist` add departmentname varchar(256) DEFAULT NULL COMMENT '所属项目部' AFTER roles;
+; ALTER TABLE `authlist` add score varchar(256) DEFAULT NULL COMMENT '测试成绩' AFTER roles;
 
 CREATE TABLE `testinglib1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -78,9 +77,10 @@ CREATE TABLE `testinglibname` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='试题库名称表';
 
 
-INSERT INTO testinglibname(name, tablename) VALUES("商品型号知识,生产工艺", "testinglib1,testinglib2");
-            goodsType,
-            goodsCode
+; INSERT INTO testinglibname(name, tablename) VALUES("商品型号知识,生产工艺", "testinglib1,testinglib2");
+;             goodsType,
+;             goodsCode
+; INSERT into authlist value (null,'0000','admin','123456','ADMIN',null,null,1) 
 
 CREATE TABLE `standard` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -102,6 +102,7 @@ CREATE TABLE `salary_day` (
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
   `departmentname` varchar(32) DEFAULT NULL COMMENT '员工部门',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
+  `foodpayday` int(3) DEFAULT NULL COMMENT '餐补',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
   `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '每天中班工资',
@@ -123,6 +124,7 @@ CREATE TABLE `salary_month` (
   `salarytype` varchar(10) DEFAULT NULL COMMENT '薪水发放类型',
   `departmentname` varchar(32) DEFAULT NULL COMMENT '员工部门',
   `salaryday` int(10) DEFAULT NULL COMMENT '日薪',
+  `foodpayday` int(3) DEFAULT NULL COMMENT '餐补',
   `workday` int(2) DEFAULT NULL COMMENT '本周工作时长',
   `salaryworkovertime` int(3) DEFAULT NULL COMMENT '加班每小时工资',
   `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '每天中班工资',
@@ -135,18 +137,6 @@ CREATE TABLE `salary_month` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='月薪无满勤薪水表';
 
-ALTER TABLE `salary_day` ADD COLUMN `departmentname` varchar(16) DEFAULT NULL COMMENT '员工部门' AFTER `salarytype`;
-ALTER TABLE `salary_month` ADD COLUMN `departmentname` varchar(16) DEFAULT NULL COMMENT '员工部门' AFTER `salarytype`;
-
-ALTER TABLE `salary_month` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
-ALTER TABLE `salary_day` ADD COLUMN `salarymiddleworkday` int(3) DEFAULT NULL COMMENT '中班每天工资' AFTER `salaryday`;
-ALTER TABLE `salary_month` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
-ALTER TABLE `salary_day` ADD COLUMN `salarynightworkday` int(3) DEFAULT NULL COMMENT '晚班每天工资' AFTER `salaryday`;
-
-ALTER TABLE `salary_month` ADD COLUMN `foodpayday` int(3) DEFAULT NULL COMMENT '餐补' AFTER `salaryday`;
-ALTER TABLE `salary_day` ADD COLUMN `foodpayday` int(3) DEFAULT NULL COMMENT '餐补' AFTER `salaryday`;
-
-INSERT into authlist value (null,'0000','admin','123456','ADMIN',null,null,1) 
 
 CREATE TABLE `transaction` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -155,6 +145,7 @@ CREATE TABLE `transaction` (
   `departmentname` varchar(10) DEFAULT NULL COMMENT '所属项目部',
   `identityid` varchar(20) DEFAULT NULL COMMENT '身份证号',
   `tel` varchar(10) DEFAULT NULL COMMENT '联系方式',
+  `timepoint` varchar(10) DEFAULT NULL COMMENT '入职/离职时间',
   `emergency` varchar(10) DEFAULT NULL COMMENT '紧急联系人',
   `emergencytel` varchar(10) DEFAULT NULL COMMENT '紧急联系人电话',
   `offerpersonname` varchar(6) DEFAULT NULL COMMENT '录入人姓名',
@@ -168,6 +159,7 @@ CREATE TABLE `transaction` (
   UNIQUE (`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='员工入职离职表';
+; ALTER TABLE `transaction` add timepoint varchar(10) DEFAULT NULL COMMENT '入职/离职时间' AFTER tel;
 
 CREATE TABLE `applyforovertimework` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -232,4 +224,12 @@ CREATE TABLE `employeeinfo` (
   UNIQUE (`employeeid`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='员工信息表';
-ALTER TABLE `employeeinfo` ADD COLUMN `status` int(1) DEFAULT NULL COMMENT '在职状态' AFTER `relationship2`;
+
+
+CREATE TABLE `departmentinfo` (
+  `id` int(2) NOT NULL AUTO_INCREMENT,
+  `depid` varchar(10) NOT NULL COMMENT '项目部编号',
+  `departmentname` varchar(15) DEFAULT NULL COMMENT '所属项目部',
+  UNIQUE (`employeeid`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='项目部信息表';
