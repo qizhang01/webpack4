@@ -3,16 +3,24 @@ import {
     Input,
     Table,
     message,
+    Form,
+    Modal,
+    Button
 } from 'antd'
 import { Panel } from '@/components/Panel'
 import './index.less'
 import fetchApi from '@/ajax/index'
-import { PlusOutlined } from '@ant-design/icons'
 
 const PageSub = () => {
     const emptylist = []
     const [totalTableData, setTotalTableData] = React.useState([])
     const [tableData, setTableData] = useState(emptylist)
+    const [isShowModel, setIsShowModel] = useState(false)
+    const [selectedItem, setSelectedItem] = useState({})
+    const formItemLayout = {
+        labelCol: { span: 4 },
+        wrapperCol: { span: 16 },
+    }
     const columns = [
         {
             title: '员工编号',
@@ -123,6 +131,15 @@ const PageSub = () => {
                 )
             },
         },
+        {
+            title: 'action',
+            key: 'action',
+            render: (text, record) => (
+              <span>
+                <a href="javascript:;" onClick={()=>edit(record)}>修改</a>
+              </span>
+            ),
+        }
     ]
 
     useEffect(() => {
@@ -137,6 +154,45 @@ const PageSub = () => {
     useEffect(()=>{
         query()
     },[])
+
+    const edit=(record)=>{
+        setIsShowModel(true)
+        setSelectedItem(record)
+    }
+    
+    const cancelModel=()=>{
+        setIsShowModel(false)
+    }
+
+    const onFinish= async (values)=>{
+        const {
+            tel ="",
+            position = "",
+            station ="",  
+            emergency1="", 
+            emergencytel1="", 
+            relationship1="",
+            emergency2="", 
+            emergencytel2="", 
+            relationship2=""
+        } = values
+        if(tel || position || station || emergency1 ||emergencytel1||relationship1
+            || emergency2 ||emergencytel2||relationship2){
+            const result = await fetchApi(
+                'api/updateemployeeinfobyid',
+                JSON.stringify({...values, employeeid: selectedItem.employeeid}),
+                'POST'
+            )
+
+            if (result.code == '200') {
+                message.info('提交成功')
+                query()
+                setIsShowModel(false)
+            } else {
+                message.info('提交失败, 请重新提交')
+            }
+        }
+    }
 
     const inputHander = (e) => {
         let data,
@@ -229,7 +285,7 @@ const PageSub = () => {
         }
     } 
 
-    return (
+    return (<>
         <Panel>
             <Input.Search placeholder="输入员工名字" allowClear onSearch={onSearch} style={{ width: 200, marginLeft: 20,marginBottom:10}} />
             {/* <label
@@ -244,6 +300,53 @@ const PageSub = () => {
             </label> */}
             <Table dataSource={tableData} columns={columns} size="small" id="employee-table"/>
         </Panel>
+        <Modal
+            title="修改信息"
+            wrapClassName="vertical-center-modal"
+            width='600px'
+            visible={isShowModel}
+            onCancel={cancelModel}
+            footer={null}
+        >
+            <Form name="config-form-onoroff" {...formItemLayout} onFinish={onFinish}>
+                <Form.Item label="姓名">
+                    <span>{selectedItem.name}</span>
+                </Form.Item>
+                <Form.Item name="tel" label="联系方式" defaultValue={selectedItem.tel}>
+                    <Input placeholder="请输入联系方式"/>
+                </Form.Item>
+                <Form.Item name="position" label="职位">
+                    <Input placeholder="请输入职位" defaultValue={selectedItem.position}/>
+                </Form.Item>
+                <Form.Item name="station" label="岗位" defaultValue={selectedItem.station}>
+                    <Input placeholder="请输入岗位"/>
+                </Form.Item>
+                <Form.Item name="emergency1" label="紧急联系人1">
+                    <Input placeholder="请输入姓名" defaultValue={selectedItem.emergency1}/>
+                </Form.Item>
+                <Form.Item name="emergencytel1" label="联系人1电话">
+                    <Input placeholder="请输入联系人1电话" defaultValue={selectedItem.emergencytel1}/>
+                </Form.Item>
+                <Form.Item name="relationship1" label="联系人1关系">
+                    <Input placeholder="请输入联系人1关系" defaultValue={selectedItem.relationship1}/>
+                </Form.Item>
+                <Form.Item name="emergency2" label="紧急联系人2">
+                    <Input placeholder="请输入姓名" />
+                </Form.Item>
+                <Form.Item name="emergencytel2" label="联系人2电话">
+                    <Input placeholder="请输入联系人2电话" />
+                </Form.Item>
+                <Form.Item name="relationship2" label="联系人2关系">
+                    <Input placeholder="请输入联系人2关系" />
+                </Form.Item>
+                <Form.Item wrapperCol={{ span: 8, offset: 9 }}>
+                    <Button type="primary" htmlType="submit" block>
+                        完成提交
+                    </Button>
+                </Form.Item>
+            </Form>            
+        </Modal>
+    </>
     )
 }
 export default PageSub
