@@ -8,7 +8,7 @@ export const Panel: React.FC = props => {
                 margin: 10,
                 background: '#fff',
                 padding: '20px 0',
-                height: '98%',
+                height: '92%',
                 overflowY: 'auto',
             }}
         >

@@ -78,11 +78,11 @@ const PageSub= () => {
             if(method=='入职'){
                 const { 
                     departmentname, identityid, tel, 
-                    emergency1, emergencytel1, relationship1,
+                    emergency1="", emergencytel1="", relationship1="",
                     emergency2="", emergencytel2 ="", relationship2="",
                     position="", station="", gender, startworktime
                 } = values
-                if(identityid.length!==18 || identityid.length!==16) {
+                if(identityid.length!==18 && identityid.length!==16) {
                     return message.info('身份证位数不正确, 请重新输入')
                 }
                 const submitname = info ? JSON.parse(info).name : ''

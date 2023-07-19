@@ -54,7 +54,10 @@ export default class Index extends React.Component {
         departmentname: '',
         isShowSetDepModel: false,
         selectedItem: null,
-        addDepartmentName: ''
+        addDepartmentName: '',
+        changedUserno: '',
+        editDepartment: true,
+        editUserno: false
     }
 
     columns = [
@@ -120,10 +123,17 @@ export default class Index extends React.Component {
                 <a href="javascript:;" onClick={()=>this.initSign(record)}>重置密码</a>
                 <Divider type="vertical"/>
                 <a href="javascript:;" onClick={()=>this.initDeparment(record)}>项目部</a>
+                <Divider type="vertical"/>
+                <a href="javascript:;" onClick={()=>this.editUserno(record)}>工号</a>
               </span>
             ),
         }
     ]
+
+    editUserno(record){
+       // updateuserno
+       this.setState({selectedItem: record, isShowSetDepModel: true,  editUserno: true, editDepartment: false})
+    }
 
     componentDidMount(){
         this.getAllUsersList()
@@ -163,7 +173,7 @@ export default class Index extends React.Component {
     }
     
     initDeparment = record => {
-        this.setState({selectedItem: record, isShowSetDepModel: true})
+        this.setState({selectedItem: record, isShowSetDepModel: true, editUserno: false, editDepartment: true})
     }
 
     initSign= async record =>{
@@ -267,8 +277,21 @@ export default class Index extends React.Component {
     }
 
     submitDepModel=()=>{
-        this.updateDepartmentName()
+        if(this.state.editDepartment){
+            this.updateDepartmentName()
+        }else {
+            this.updateUserno()
+        }
     }
+
+    updateUserno = async ()=>{
+        this.setState({isShowSetDepModel:false})
+        const {changedUserno, selectedItem } = this.state
+        const { id } = selectedItem
+        const res = await fetchAPI('/api/users/updateUserno',JSON.stringify({id, userno: changedUserno}),"POST")
+        res && this.getAllUsersList()
+    }
+
     onChangeCode=(e)=>{
        this.setState({
         userno: e.target.value
@@ -287,7 +310,11 @@ export default class Index extends React.Component {
             addRoles:e
         })
     }
-
+    onChangeUserno=(e)=>{
+        this.setState({
+            changedUserno: e.target.value
+        })
+    }
     onChangePassword=(e)=>{
         this.setState({
             password: e.target.value
@@ -322,7 +349,7 @@ export default class Index extends React.Component {
             addEmployeeName,addRoles,
             userno, selectedItem,
             isShowSetDepModel,departmentname,
-            addDepartmentName
+            addDepartmentName, editDepartment, editUserno, changedUserno
         } = this.state
         return (
             <Panel>
@@ -339,12 +366,6 @@ export default class Index extends React.Component {
                         columns={this.columns}
                         dataSource={employeeList}
                         bordered
-                        pagination = {
-                            {
-                                pageSize: 20,
-                                showSizeChanger: true,
-                            }
-                        }
                     >
                     </Table>
 
@@ -402,7 +423,7 @@ export default class Index extends React.Component {
                         </Row>
                     </Modal>
                     <Modal
-                        title="录入项目部"
+                        title={editDepartment?'修改项目部' : '修改工号'}
                         wrapClassName="vertical-center-modal"
                         width='600px'
                         visible={isShowSetDepModel}
@@ -411,14 +432,21 @@ export default class Index extends React.Component {
                             <Button key="close" onClick={this.cancelDepModel}>
                                关闭
                             </Button>,
-                            <Button key="submit" disabled = {!departmentname} type="primary"  onClick={this.submitDepModel}>
+                            <Button key="submit" disabled = {!departmentname && !changedUserno} type="primary"  onClick={this.submitDepModel}>
                                确定
                             </Button>,
                         ]}
                     >
-                        {/* <Row>
-                            <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>姓名: {selectedItem.name}</span>
-                        </Row> */}
+                        {editUserno ? 
+                        <Row>
+                            <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>工号: </span>
+                            <Input placeholder="请输入工号"
+                                onChange={this.onChangeUserno}
+                                style={{ width: 200,marginLeft: 10,marginBottom: 10  }}
+                                value={changedUserno}
+                            >
+                            </Input>
+                        </Row>:
                         <Row>
                             <span style={{width: 100, display: 'inline-block',textAlign: 'right'}}>项目部名称:</span>
                             <Input placeholder="请输入项目部名称"
@@ -428,6 +456,7 @@ export default class Index extends React.Component {
                                 >
                             </Input>
                         </Row>
+                      }
                     </Modal>
                 </div>
             </Panel>

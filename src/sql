@@ -144,7 +144,7 @@ CREATE TABLE `transaction` (
   `type` varchar(4) DEFAULT NULL COMMENT '事物类型',
   `departmentname` varchar(10) DEFAULT NULL COMMENT '所属项目部',
   `identityid` varchar(20) DEFAULT NULL COMMENT '身份证号',
-  `tel` varchar(10) DEFAULT NULL COMMENT '联系方式',
+  `tel` varchar(12) DEFAULT NULL COMMENT '联系方式',
   `timepoint` varchar(10) DEFAULT NULL COMMENT '入职/离职时间',
   `emergency` varchar(10) DEFAULT NULL COMMENT '紧急联系人',
   `emergencytel` varchar(10) DEFAULT NULL COMMENT '紧急联系人电话',
