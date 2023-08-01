@@ -17,6 +17,7 @@ const PageSub = () => {
     const [tableData, setTableData] = useState(emptylist)
     const [isShowModel, setIsShowModel] = useState(false)
     const [selectedItem, setSelectedItem] = useState({})
+    const [tableloading, setTableloading] = useState(false)
     const formItemLayout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
@@ -55,6 +56,10 @@ const PageSub = () => {
             title: '性别',
             dataIndex: 'gender',
             key: 'gender',
+            render(text, record) {
+                const identityid = record.identityid
+                return Number(identityid.substr(identityid.length - 2,1)) % 2 == 0 ? '女': '男'
+            }
         },
         {
             title: '职位',
@@ -166,6 +171,7 @@ const PageSub = () => {
 
     const onFinish= async (values)=>{
         const {
+            departmentname="",
             tel ="",
             position = "",
             station ="",  
@@ -176,7 +182,7 @@ const PageSub = () => {
             emergencytel2="", 
             relationship2=""
         } = values
-        if(tel || position || station || emergency1 ||emergencytel1||relationship1
+        if(departmentname || tel || position || station || emergency1 ||emergencytel1||relationship1
             || emergency2 ||emergencytel2||relationship2){
             const result = await fetchApi(
                 'api/updateemployeeinfobyid',
@@ -274,12 +280,14 @@ const PageSub = () => {
     }
 
     const query = async () => {
+        setTableloading(true)
         const {roles, departmentname} = JSON.parse(localStorage.getItem("xx-auth-key"))
         const result = await fetchApi('api/applyallemployee', JSON.stringify({roles, departmentname}),'POST')
         if (result.code == '200') {
             const d = result.data
             setTableData(d)
             setTotalTableData(d)
+            setTableloading(false)
         } else {
             message.info('查询失败, 请重新提交')
         }
@@ -298,7 +306,18 @@ const PageSub = () => {
                 <PlusOutlined /> 导入excel文件
                 <input id="importEmployeeInfo" type="file" style={{ display: 'none' }} />
             </label> */}
-            <Table dataSource={tableData} columns={columns} size="small" id="employee-table"/>
+            <Table 
+                dataSource={tableData} 
+                columns={columns} 
+                loading ={tableloading}
+                pagination = {
+                    {
+                        pageSize: 20,
+                        showSizeChanger: true,
+                    }
+                }
+                size="small" 
+                id="employee-table"/>
         </Panel>
         <Modal
             title="修改信息"
@@ -312,32 +331,35 @@ const PageSub = () => {
                 <Form.Item label="姓名">
                     <span>{selectedItem.name}</span>
                 </Form.Item>
+                <Form.Item name="departmentname" label="项目部">
+                    <Input placeholder="请输入项目部" defaultValue={selectedItem.departmentname} key={selectedItem.departmentname} />
+                </Form.Item>
                 <Form.Item name="tel" label="联系方式">
-                    <Input placeholder="请输入联系方式" defaultValue={selectedItem.tel} />
+                    <Input placeholder="请输入联系方式" defaultValue={selectedItem.tel} key={selectedItem.tel} />
                 </Form.Item>
                 <Form.Item name="position" label="职位">
-                    <Input placeholder="请输入职位" defaultValue={selectedItem.position}/>
+                    <Input placeholder="请输入职位" defaultValue={selectedItem.position} key={selectedItem.position} />
                 </Form.Item>
                 <Form.Item name="station" label="岗位" >
-                    <Input placeholder="请输入岗位" defaultValue={selectedItem.station} />
+                    <Input placeholder="请输入岗位" defaultValue={selectedItem.station} key={selectedItem.station} />
                 </Form.Item>
                 <Form.Item name="emergency1" label="紧急联系人1">
-                    <Input placeholder="请输入姓名" defaultValue={selectedItem.emergency1}/>
+                    <Input placeholder="请输入姓名" defaultValue={selectedItem.emergency1} key={selectedItem.emergency1} />
                 </Form.Item>
                 <Form.Item name="emergencytel1" label="联系人1电话">
-                    <Input placeholder="请输入联系人1电话" defaultValue={selectedItem.emergencytel1}/>
+                    <Input placeholder="请输入联系人1电话" defaultValue={selectedItem.emergencytel1} key={selectedItem.emergencytel1} />
                 </Form.Item>
                 <Form.Item name="relationship1" label="联系人1关系">
-                    <Input placeholder="请输入联系人1关系" defaultValue={selectedItem.relationship1}/>
+                    <Input placeholder="请输入联系人1关系" defaultValue={selectedItem.relationship1} key={selectedItem.relationship1} />
                 </Form.Item>
                 <Form.Item name="emergency2" label="紧急联系人2">
-                    <Input placeholder="请输入姓名" defaultValue={selectedItem.emergency2} />
+                    <Input placeholder="请输入姓名" defaultValue={selectedItem.emergency2} key={selectedItem.emergency2} />
                 </Form.Item>
                 <Form.Item name="emergencytel2" label="联系人2电话">
-                    <Input placeholder="请输入联系人2电话" defaultValue={selectedItem.emergencytel2}/>
+                    <Input placeholder="请输入联系人2电话" defaultValue={selectedItem.emergencytel2} key={selectedItem.emergencytel2} />
                 </Form.Item>
                 <Form.Item name="relationship2" label="联系人2关系">
-                    <Input placeholder="请输入联系人2关系" defaultValue={selectedItem.relationship2} />
+                    <Input placeholder="请输入联系人2关系" defaultValue={selectedItem.relationship2} key={selectedItem.relationship2} />
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 8, offset: 9 }}>
                     <Button type="primary" htmlType="submit" block>

@@ -57,7 +57,8 @@ export default class Index extends React.Component {
         addDepartmentName: '',
         changedUserno: '',
         editDepartment: true,
-        editUserno: false
+        editUserno: false,
+        tableloading: false
     }
 
     columns = [
@@ -144,6 +145,7 @@ export default class Index extends React.Component {
     }
 
     async getAllUsersList(){
+        this.setState({  tableloading: true })
         const d = await fetchAPI('api/users/allusers')
         let employeeList = d.data.map( item => {
             return {
@@ -151,7 +153,7 @@ export default class Index extends React.Component {
                 key: item.id
             }
         })
-       this.setState({ employeeList})
+       this.setState({ employeeList, tableloading: false})
     }
 
     onChangeRoles= async (record,e) =>{
@@ -348,7 +350,7 @@ export default class Index extends React.Component {
         const {employeeList,isShowModel,
             addEmployeeName,addRoles,
             userno, selectedItem,
-            isShowSetDepModel,departmentname,
+            isShowSetDepModel,departmentname,tableloading,
             addDepartmentName, editDepartment, editUserno, changedUserno
         } = this.state
         return (
@@ -366,6 +368,13 @@ export default class Index extends React.Component {
                         columns={this.columns}
                         dataSource={employeeList}
                         bordered
+                        loading={tableloading}
+                        pagination = {
+                            {
+                                pageSize: 20,
+                                showSizeChanger: true,
+                            }
+                        }
                     >
                     </Table>
 

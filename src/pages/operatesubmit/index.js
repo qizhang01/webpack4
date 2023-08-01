@@ -342,7 +342,11 @@ const PageSub = () => {
     }
 
     const query = async () => {
-        const result = await fetchApi('api/getonoroffworkstatus')
+        let departmentname = cache.departmentname
+        if(roles.includes('OPERATE')||roles.includes('HR')||roles.includes('ADMIN')){
+            departmentname=""
+        }
+        const result = await fetchApi('api/getonoroffworkstatus',JSON.stringify({departmentname}),'POST')
         if (result.code == '200') {
             const d = result.data
             setTableData(d)
@@ -353,7 +357,11 @@ const PageSub = () => {
     } 
     //applyforaddsalarystatus
     const queryAddSalary = async () => {
-        const result = await fetchApi('api/applyforaddsalarystatus')
+        let departmentname = cache.departmentname
+        if(roles.includes('OPERATE')||roles.includes('HR')||roles.includes('ADMIN')){
+            departmentname=""
+        }
+        const result = await fetchApi('api/applyforaddsalarystatus',JSON.stringify({departmentname}),'POST')
         if (result.code == '200') {
             const d = result.data
             setAddSalaryTableData(d)
@@ -364,7 +372,11 @@ const PageSub = () => {
 
     //applyforovertimeworkstatus
     const queryForOvertimework = async () => {
-        const result = await fetchApi('api/applyforovertimeworkstatus')
+        let departmentname = cache.departmentname
+        if(roles.includes('OPERATE')||roles.includes('HR')||roles.includes('ADMIN')){
+            departmentname=""
+        }
+        const result = await fetchApi('api/applyforovertimeworkstatus',JSON.stringify({departmentname}),'POST')
         if (result.code == '200') {
             const d = result.data
             setOverworkTableData(d)
@@ -383,9 +395,43 @@ const PageSub = () => {
             <Button style={{marginLeft: 30}} type={buttonkey==1?"primary":"default"} onClick={()=>handleButtonClick(1)}>入职/离职</Button>
             <Button style={{marginLeft: 30}} type={buttonkey==2?"primary":"default"} onClick={()=>handleButtonClick(2)}>加班申请</Button > 
             <Button style={{marginLeft: 30}} type={buttonkey==3?"primary":"default"} onClick={()=>handleButtonClick(3)}>加薪申请</Button>
-            {buttonkey==1 &&<Table dataSource={tableData} columns={columns} size="small" id="operate-submit-table"/>}
-            {buttonkey==2 &&<Table dataSource={overworktableData} columns={columnsoverwork} size="small" id="operate-submit-table"/>}
-            {buttonkey==3 &&<Table dataSource={addsalarytableData} columns={columnsaddsalary} size="small" id="operate-submit-table"/>}
+            {buttonkey==1 &&<Table 
+                dataSource={tableData} 
+                columns={columns}
+                pagination = {
+                    {
+                        pageSize: 20,
+                        showSizeChanger: true,
+                    }
+                }
+                size="small" 
+                id="operate-submit-table"
+                />
+            }
+            {buttonkey==2 &&<Table 
+                dataSource={overworktableData} 
+                columns={columnsoverwork}
+                pagination = {
+                    {
+                        pageSize: 20,
+                        showSizeChanger: true,
+                    }
+                }
+                size="small" 
+                id="operate-submit-table"/>}
+            {buttonkey==3 &&<Table 
+                dataSource={addsalarytableData} 
+                columns={columnsaddsalary}
+                pagination = {
+                    {
+                        pageSize: 20,
+                        showSizeChanger: true,
+                    }
+                }
+                size="small" 
+                id="operate-submit-table"
+                />
+            }
         </Panel>
     )
 }
