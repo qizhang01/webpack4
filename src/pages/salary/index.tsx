@@ -44,6 +44,7 @@ const PageSub: React.FC = () => {
     const [salaryworkovertime, setSalaryworkovertime] = React.useState('')
     const [salaryLabel, setSalaryLabel] = React.useState('日薪')
     const [foodpayday, setFoodpayday] = React.useState('') //餐补
+    const [tableLoading, setTableLoading] = useState(false)
     const cache = localStorage.getItem('xx-auth-key')
         ? JSON.parse(localStorage.getItem('xx-auth-key') || '')
         : null
@@ -140,7 +141,6 @@ const PageSub: React.FC = () => {
     ]
     const onSearch =(v:String)=>{
         if(v.length==0 || v=="" || !v){
-            debugger
             setTableData(totalTableData)
         }else{
             const filter = tableData.filter(item => item.employeeid.includes(v) || item.name==v)
@@ -307,6 +307,7 @@ const PageSub: React.FC = () => {
     }
     
     const query = async () => {
+        setTableLoading(true)
         const cache = localStorage.getItem('xx-auth-key')
         ? JSON.parse(localStorage.getItem('xx-auth-key')||"")
         : null
@@ -316,6 +317,7 @@ const PageSub: React.FC = () => {
             const d = result.data
             setTableData(d)
             setTotalTableData(d)
+            setTableLoading(false)
         } else {
             message.info('查询失败, 请重新提交')
         }
@@ -393,6 +395,8 @@ const PageSub: React.FC = () => {
             if (result.code == '200') {
                 // message.info('提交成功')
                 query()
+            }else {
+                message.info(result);
             }
         }
     }
@@ -516,7 +520,7 @@ const PageSub: React.FC = () => {
                         type = "primary"
                         >下载薪水表
                     </Button>
-                    <Table dataSource={tableData} columns={columns} size="small" id="salary-table"/>
+                    <Table dataSource={tableData} loading = {tableLoading} columns={columns} size="small" id="salary-table"/>
                     <Modal
                         title="修改薪水"
                         wrapClassName="vertical-center-modal"

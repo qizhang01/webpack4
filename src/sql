@@ -80,7 +80,7 @@ CREATE TABLE `testinglibname` (
 ; INSERT INTO testinglibname(name, tablename) VALUES("商品型号知识,生产工艺", "testinglib1,testinglib2");
 ;             goodsType,
 ;             goodsCode
-; INSERT into authlist value (null,'0000','admin','123456','ADMIN',null,null,1) 
+; INSERT into authlist value (null,'1000','admin','123456','ADMIN',null,null,1) 
 
 CREATE TABLE `standard` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -201,7 +201,7 @@ CREATE TABLE `applyforaddsalary` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='调薪事物表';
 
-
+delete from employeeinfo where employeeid = "J000264";
 CREATE TABLE `employeeinfo` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `employeeid` varchar(10) NOT NULL COMMENT '员工编号',
@@ -233,3 +233,9 @@ CREATE TABLE `departmentinfo` (
   UNIQUE (`employeeid`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='项目部信息表';
+
+
+alter table employeeinfo add primary key(id);
+ALTER TABLE transaction MODIFY COLUMN emergencytel VARCHAR(12);
+ALTER TABLE employeeinfo ADD UNIQUE (identityid);
+update  b set b.departmentname = a.departmentname from  employeeinfo a, salary_day b  where a.employeeid = b.employeeid; 

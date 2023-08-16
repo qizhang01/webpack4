@@ -123,7 +123,11 @@ const PageSub= () => {
             }
 
             if (result.code == '200') {
-                message.info('申请成功')
+                if(result.msg){
+                    message.info(result.msg)
+                }else{
+                    message.info('申请成功')
+                }
             } else {
                 message.info('申请失败, 请重新提交')
             }

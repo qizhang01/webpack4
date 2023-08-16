@@ -29,6 +29,11 @@ const PageSub = () => {
     const roles = cache.roles
     const columns = [
         {
+            title: '序号',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
             title: '申请类型',
             dataIndex: 'type',
             key: 'type',

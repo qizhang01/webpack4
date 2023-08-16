@@ -5,11 +5,15 @@ import {
     message,
     Form,
     Modal,
-    Button
+    Button,
+    Select
 } from 'antd'
 import { Panel } from '@/components/Panel'
 import './index.less'
 import fetchApi from '@/ajax/index'
+import XLSX from 'xlsx'
+
+const { Option } = Select
 
 const PageSub = () => {
     const emptylist = []
@@ -18,6 +22,14 @@ const PageSub = () => {
     const [isShowModel, setIsShowModel] = useState(false)
     const [selectedItem, setSelectedItem] = useState({})
     const [tableloading, setTableloading] = useState(false)
+    const [options,setDepartmentOptions] = useState([])
+    let selecteddepartmentname =""
+    let selectedworkstatus =""
+    const cache = localStorage.getItem('xx-auth-key')
+        ? JSON.parse(localStorage.getItem('xx-auth-key') || '')
+        : null
+    const roles = cache.roles
+
     const formItemLayout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
@@ -158,6 +170,7 @@ const PageSub = () => {
 
     useEffect(()=>{
         query()
+        queryAllDepartment()
     },[])
 
     const edit=(record)=>{
@@ -292,20 +305,134 @@ const PageSub = () => {
             message.info('查询失败, 请重新提交')
         }
     } 
+    
+    const queryAllDepartment = async ()=>{
+        if(roles.includes("ADMIN")){
+            const d = await fetchApi('api/users/allusers')
+            // const set = new Set()
+            // set.add('全部')
+            let list = ['全部']
+            d.data.map( item => {
+                if(item.departmentname && !list.includes(item.departmentname)){
+                    // set.add(item.departmentname)
+                    list.push(item.departmentname)
+                }
+            })
+            // setDepartmentOptions(Array.from(set))
+            setDepartmentOptions(list)
+        }
+    }
+
+    const downloadTable=()=>{
+        if(tableData.length>0){
+            const year = new Date().getFullYear()
+            const month = new Date().getMonth() + 1
+            let monthStr = month.toString()
+            if(month<10) monthStr = `0${monthStr}`
+            const topic = ['员工编号','姓名','项目部','身份证号','出生日期','职位','岗位','入职时间','电话','联系人1','联系人1电话','关系']
+            const d = tableData.map(item => [item.employeeid, item.name, item.departmentname, item.identityid,
+                item.borntime, item.position, item.station, item.startworktime,
+                item.tel, item.emergency1, item.emergencytel1, item.relationship1
+            ])
+
+            const content = XLSX.utils.aoa_to_sheet([topic, ...d])
+            const workbook = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(workbook,content)
+            XLSX.writeFile(workbook, `employee-${year}-${monthStr}.xlsx`)
+        }
+    }
+
+    const handleDepartChange=(v)=>{
+        if(v!="全部"){
+            selecteddepartmentname=v
+        }else {
+            selecteddepartmentname=""
+        }
+        if(selectedworkstatus==""&& selecteddepartmentname==""){
+            setTableData(totalTableData)
+        }else if(selectedworkstatus==""&& selecteddepartmentname!==""){
+            const d = totalTableData.filter(item=> item.departmentname == selecteddepartmentname )
+            setTableData(d)
+        }else if(selecteddepartmentname==""&& selectedworkstatus!==""){
+            if(selectedworkstatus=="在职"){
+                const d = totalTableData.filter(item=> item.status !=3 && item.status!=4 )
+                setTableData(d)
+            }else {
+                const d = totalTableData.filter(item=> item.status ==3||item.status==4 )
+                setTableData(d)
+            }
+        }else if(selectedworkstatus!==""&& selecteddepartmentname!==""){
+            if(selectedworkstatus=="在职"){
+                const d = totalTableData.filter(item=> item.departmentname == selecteddepartmentname &&(item.status !=3 && item.status!=4))
+                setTableData(d)
+            }else {
+                const d = totalTableData.filter(item=> item.departmentname == selecteddepartmentname && (item.status ==3||item.status==4) )
+                setTableData(d)
+            }
+        }
+    }
+
+    const handleStatusChange=(v)=>{
+        if(v!="全部"){
+            selectedworkstatus=v
+        }else {
+            selectedworkstatus=""
+        }
+        if(selectedworkstatus==""&& selecteddepartmentname==""){
+            setTableData(totalTableData)
+        }else if(selectedworkstatus==""&& selecteddepartmentname!==""){
+            const d = totalTableData.filter(item=> item.departmentname == selecteddepartmentname )
+            setTableData(d)
+        }else if(selecteddepartmentname==""&& selectedworkstatus!==""){
+            if(selectedworkstatus=="在职"){
+                const d = totalTableData.filter(item=> item.status !=3 && item.status!=4 )
+                setTableData(d)
+            }else {
+                const d = totalTableData.filter(item=> item.status ==3||item.status==4 )
+                setTableData(d)
+            }
+        }else if(selectedworkstatus!==""&& selecteddepartmentname!==""){
+            if(selectedworkstatus=="在职"){
+                const d = totalTableData.filter(item=> item.departmentname == selecteddepartmentname &&(item.status !=3 && item.status!=4))
+                setTableData(d)
+            }else {
+                const d = totalTableData.filter(item=> item.departmentname == selecteddepartmentname && (item.status ==3||item.status==4) )
+                setTableData(d)
+            }
+        }
+    }
 
     return (<>
         <Panel>
-            <Input.Search placeholder="输入员工名字" allowClear onSearch={onSearch} style={{ width: 200, marginLeft: 20,marginBottom:10}} />
-            {/* <label
-                className="ant-btn ant-btn-primary"
-                style={{
-                    width: '160px',
-                    marginLeft: 20,
-                }}
-            >
-                <PlusOutlined /> 导入excel文件
-                <input id="importEmployeeInfo" type="file" style={{ display: 'none' }} />
-            </label> */}
+            <Input.Search placeholder="输入员工名字" allowClear onSearch={onSearch} style={{ width: 200, marginLeft: 20,marginBottom:10, marginRight: 50}} />
+                <Button 
+                    onClick={downloadTable}
+                    type = "primary"
+                    style={{ marginRight: 50 }}
+                    >下载员工表
+                </Button>
+                {roles.includes("ADMIN") &&
+                    <Select 
+                        key="selectdep"
+                        placeholder="请选择项目部"
+                        style={{ width: 250, marginRight: 50 }}
+                        onChange={handleDepartChange}
+                    >
+                        {
+                            options.map(item => <Option value={item} key={item}>{item}</Option>)
+                        }
+                    </Select>
+                }
+                <Select 
+                    key="selectonoff"
+                    placeholder="请选择在职状态"
+                    style={{ width: 250}}
+                    onChange={handleStatusChange}
+                >
+                    <Option value="全部" key="0">全部</Option>
+                    <Option value="在职" key="1">在职</Option>
+                    <Option value="离职" key="2">离职</Option>
+                </Select>
             <Table 
                 dataSource={tableData} 
                 columns={columns} 
