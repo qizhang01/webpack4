@@ -368,13 +368,8 @@ export default class Index extends React.Component {
                         columns={this.columns}
                         dataSource={employeeList}
                         bordered
+                        size="small" 
                         loading={tableloading}
-                        pagination = {
-                            {
-                                pageSize: 20,
-                                showSizeChanger: true,
-                            }
-                        }
                     >
                     </Table>
 

@@ -130,20 +130,21 @@ const PageSub = () => {
             key: 'status',
             render(text, record) {
                 let content = ""
+                let stl ={color: '#1890ff'}
                 if(text==1){
                     content ="入职中"
                 }else if(text==2){
                     content ="在职"
                 }else if(text==3){
                     content ="离职中"
+                    stl = {color: 'red'}
                 }else if(text==4){
                     content ="离职"
+                    stl = {color: 'red'}
                 }
                 return (
-                    <span>
-                        <a href="javascript:;">
-                            {content}
-                        </a>
+                    <span style={stl}>
+                        {content}
                     </span>
                 )
             },
@@ -437,12 +438,6 @@ const PageSub = () => {
                 dataSource={tableData} 
                 columns={columns} 
                 loading ={tableloading}
-                pagination = {
-                    {
-                        pageSize: 20,
-                        showSizeChanger: true,
-                    }
-                }
                 size="small" 
                 id="employee-table"/>
         </Panel>

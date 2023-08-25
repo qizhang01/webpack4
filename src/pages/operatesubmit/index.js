@@ -403,12 +403,6 @@ const PageSub = () => {
             {buttonkey==1 &&<Table 
                 dataSource={tableData} 
                 columns={columns}
-                pagination = {
-                    {
-                        pageSize: 20,
-                        showSizeChanger: true,
-                    }
-                }
                 size="small" 
                 id="operate-submit-table"
                 />
@@ -416,23 +410,11 @@ const PageSub = () => {
             {buttonkey==2 &&<Table 
                 dataSource={overworktableData} 
                 columns={columnsoverwork}
-                pagination = {
-                    {
-                        pageSize: 20,
-                        showSizeChanger: true,
-                    }
-                }
                 size="small" 
                 id="operate-submit-table"/>}
             {buttonkey==3 &&<Table 
                 dataSource={addsalarytableData} 
                 columns={columnsaddsalary}
-                pagination = {
-                    {
-                        pageSize: 20,
-                        showSizeChanger: true,
-                    }
-                }
                 size="small" 
                 id="operate-submit-table"
                 />
