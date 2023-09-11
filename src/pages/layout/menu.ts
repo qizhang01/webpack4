@@ -44,6 +44,10 @@ export const permission = {
             uri: RouteUri.PageSub5,
         },
         {
+            title: '合同管理',
+            uri: '/root/contract',
+        },
+        {
             title: '试题录入',
             uri: '/root/sub1',
         },
@@ -57,6 +61,7 @@ export const permission = {
         },
     ],
 }
+
 export const employeeinfo = {
     title: '员工信息',
     show: true,

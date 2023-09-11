@@ -38,11 +38,11 @@ export const routes: RouteInterface[] = [
                 component: loadable(() => import('@/pages/operatesubmit')),
                 exact: true,
             },
-            // {
-            //     path: '/root/hrsubmit',
-            //     component: loadable(() => import('@/pages/hrsubmit')),
-            //     exact: true,
-            // },
+            {
+                path: '/root/contract',
+                component: loadable(() => import('@/pages/page1/contractinfo')),
+                exact: true,
+            },
             {
                 path: '/root/salary',
                 component: loadable(() => import('@/pages/salary')),

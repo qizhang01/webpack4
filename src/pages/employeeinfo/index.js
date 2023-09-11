@@ -95,6 +95,40 @@ const PageSub = () => {
             key: 'tel',
         },
         {
+            title: '银行卡号',
+            dataIndex: 'bankaccount',
+            key: 'bankaccount',
+        },
+        {
+            title: '开户行',
+            dataIndex: 'bankname',
+            key: 'bankname',
+            render(text, record) {
+                return `${record.bankname}(${record.bankprovince}-${record.bankcity})`
+            }
+        },
+        {
+            title: '籍贯',
+            dataIndex: 'bornplace',
+            key: 'bornplace',
+        },
+        {
+            title: '现住地',
+            dataIndex: 'nowaddress',
+            key: 'nowaddress',
+        },
+        {
+            title: '是否住宿',
+            dataIndex: 'ifneedroom',
+            key: 'ifneedroom',
+        },
+        
+        {
+            title: '电话',
+            dataIndex: 'tel',
+            key: 'tel',
+        },
+        {
             title: '紧急联系人1',
             dataIndex: 'emergency1',
             key: 'emergency1',
