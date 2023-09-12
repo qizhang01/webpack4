@@ -10,6 +10,7 @@ const ContractInput =() =>{
     const [identityid, setIdentityid] = useState("")
     const [departmentname, setDepartmentname] = useState("")
     const [employeeid, setEmployeeid] = useState("")
+    const stl = { width: 280}
     useEffect(()=>{
         fetchEmployee()
     },[])
@@ -43,6 +44,7 @@ const ContractInput =() =>{
             <Form.Item
                 name="name"
                 label="请选择姓名"
+                rules={[{ required: true, message: '必须选择员工' }]}
             >
                 <Select
                     placeholder="请选择员工姓名"
@@ -56,37 +58,63 @@ const ContractInput =() =>{
                     ))}
                 </Select>
             </Form.Item>
+            <Form.Item
+                name="type"
+                label="请选择合同种类"
+                rules={[{ required: true, message: '必须选择一种类型'}]}
+            >
+                <Select
+                    placeholder="请选择类型"
+                    style={{ width: 280, display: 'block' }}
+                >
+                    <Option value="提前离职" key="1">提前离职</Option>
+                    <Option value="到期离职" key="2">到期离职</Option>
+                    <Option value="到期续约" key="3">到期续约</Option>
+                </Select>
+            </Form.Item>
             <Form.Item label="身份证号">
-                <Input placeholder="请输入身份证号" value={identityid} disabled/>
+                <Input placeholder="请输入身份证号" value={identityid} disabled />
             </Form.Item>
             <Form.Item label="员工编号">
-                <Input placeholder="请输入员工编号" value={employeeid} disabled/>
+                <Input placeholder="请输入员工编号" value={employeeid} disabled />
             </Form.Item>
             <Form.Item label="项目部">
-                <Input placeholder="请输入项目部" value={departmentname} disabled/>
+                <Input placeholder="请输入项目部" value={departmentname} disabled />
             </Form.Item>
             <Form.Item label="用人单位" name="company">
-                <Input placeholder="请输入单位" />
+                <Input placeholder="请输入单位" style={stl}/>
             </Form.Item>
             <Form.Item name="firsttime" label="初次入职时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
-                <DatePicker style={{ width: 280}}/>
+                <DatePicker style={stl}/>
             </Form.Item>
-            <Form.Item label="合同类型" name="contracttype">
-                <Input placeholder="请输入项目部" />
+            <Form.Item label="合同类型" name="contracttype" rules={[{ required: true, message: '必须输入合同类型' }]}>
+                <Input placeholder="请输入合同类型" style={stl}/>
             </Form.Item>
-            <Form.Item label="员工类型" name="employeetype">
-                <Input placeholder="请输入项目部" />
+            <Form.Item label="员工类型" name="employeetype" rules={[{ required: true, message: '必须输入员工类型' }]}>
+                <Input placeholder="请输入员工类型" style={stl}/>
             </Form.Item>
             <Form.Item label="签约次数" name="number" rules={[{ required: true, message: '必须选择签约次数' }]}>
                 <InputNumber min={1} max={10} placeholder="请选择签约次数"/>
             </Form.Item>
             <Form.Item name="signstarttime" label="签约起始时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
-                <DatePicker style={{ width: 280}}/>
+                <DatePicker style={stl}/>
             </Form.Item>
             <Form.Item name="signendtime" label="签约终止时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
-                <DatePicker style={{ width: 280}}/>
+                <DatePicker style={stl}/>
             </Form.Item>
-            <Form.Item wrapperCol={{ span: 8, offset: 9 }}>
+            <Form.Item label="社保缴纳地" name="sbaoaddress">
+                <Input placeholder="请输入社保缴纳地" style={stl}/>
+            </Form.Item>
+            <Form.Item name="sbaotime" label="缴纳时间" >
+                <DatePicker style={stl}/>
+            </Form.Item>
+            <Form.Item label="社保转移地" name="sbaochangeaddress">
+                <Input placeholder="请输入社保转移地" style={stl}/>
+            </Form.Item>
+            <Form.Item name="sbaochangetime" label="社保转移时间" >
+                <DatePicker style={stl}/>
+            </Form.Item>
+            <Form.Item wrapperCol={{ span: 6, offset: 9 }}>
                 <Button type="primary" htmlType="submit" block>
                     完成提交
                 </Button>
