@@ -37,13 +37,18 @@ const PageSub: React.FC = () => {
     const [method, setMethod] = useState('日结')
     const [tableData, setTableData] = useState(emptylist)
     const [isShowModel, setIsShowModel] = React.useState(false)
-    const [salaryday, setSalaryday] = React.useState('')
-    const [worklong, setWorklong] = React.useState('')
-    const [worklongsalary, setWorklongsalary] = React.useState('')
+
     let [selectedItem, setSelectedItem] = React.useState({})
-    const [salaryworkovertime, setSalaryworkovertime] = React.useState('')
     const [salaryLabel, setSalaryLabel] = React.useState('日薪')
-    const [foodpayday, setFoodpayday] = React.useState('') //餐补
+
+    const [foodpayday, setFoodpayday] = React.useState(0) //餐补
+    const [salaryday, setSalaryday] = React.useState(0)
+    const [worklongsalary, setWorklongsalary] = React.useState(0)
+    const [worklong, setWorklong] = React.useState(0)
+    const [middlepay, setMiddlepay] = React.useState(0)
+    const [nightpay, setNightpay] = React.useState(0)
+    const [salaryworkovertime, setSalaryworkovertime] = React.useState(0)
+
     const [tableLoading, setTableLoading] = useState(false)
     const cache = localStorage.getItem('xx-auth-key')
         ? JSON.parse(localStorage.getItem('xx-auth-key') || '')
@@ -261,22 +266,27 @@ const PageSub: React.FC = () => {
         let body: any = {
             ...selectedItem,
         }
-        if(salaryday){
+        if(salaryday>=0){
             body.salaryday = salaryday
         }
-        if(worklong){
+        if(worklong>=0){
             body.worklong = worklong
         }
-        if(worklongsalary){
+        if(worklongsalary>=0){
             body.worklongsalary = worklongsalary
         }
-        if(salaryworkovertime){
+        if(salaryworkovertime>=0){
             body.salaryworkovertime = salaryworkovertime
         }
-        if(foodpayday){
+        if(foodpayday>=0){
             body.foodpayday = foodpayday
         }
-        console.log(selectedItem)
+        if(middlepay>=0){
+            body.salarymiddleworkday = middlepay
+        }
+        if(nightpay>=0){
+            body.salarynightworkday = nightpay
+        }
         const result = await fetchApi(`api/salary/update`, JSON.stringify(body), 'POST')
         if (result.code == '200') {
             message.info(`提交成功`)
@@ -288,7 +298,7 @@ const PageSub: React.FC = () => {
 
     const reset=(record:any)=>{
         setIsShowModel(true)
-        const {salarytype, name, employeeid,  salaryday, worklong=0, worklongmoney=0, salaryworkovertime, foodpayday}=record
+        const {salarytype, name, employeeid,  salaryday, worklong=0, worklongmoney=0, salaryworkovertime, foodpayday,salarymiddleworkday, salarynightworkday}=record
         if(salarytype=="日结"){
             setSalaryLabel("日薪")
         }else{
@@ -302,8 +312,17 @@ const PageSub: React.FC = () => {
             worklong,
             worklongmoney,
             salaryworkovertime,
-            foodpayday
+            foodpayday,
+            salarymiddleworkday,
+            salarynightworkday
         })
+        setFoodpayday(foodpayday)
+        setSalaryday(salaryday)
+        setWorklongsalary(worklongmoney)
+        setWorklong(worklong)
+        setMiddlepay(salarymiddleworkday)
+        setNightpay(salarynightworkday)
+        setSalaryworkovertime(salaryworkovertime)
     }
     
     const query = async () => {
@@ -530,11 +549,11 @@ const PageSub: React.FC = () => {
                         footer={[
                             <Button key="close" onClick={() => {
                                 setIsShowModel(false)
-                                setFoodpayday("")
-                                setWorklongsalary("")
-                                setSalaryday("")
-                                setSalaryworkovertime("")
-                                setWorklong("")
+                                setFoodpayday(0)
+                                setWorklongsalary(0)
+                                setSalaryday(0)
+                                setSalaryworkovertime(0)
+                                setWorklong(0)
                             }}>
                                 关闭
                             </Button>,
@@ -590,6 +609,44 @@ const PageSub: React.FC = () => {
                                 }}
                                 style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
                                 value={salaryworkovertime}
+                            ></InputNumber>
+                        </Row>
+                        <Row>
+                            <span
+                                style={{
+                                    width: 100,
+                                    display: 'inline-block',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                中班补贴:
+                            </span>
+                            <InputNumber
+                                placeholder="请输入中班补贴"
+                                onChange={value=> {
+                                    setMiddlepay(value)
+                                }}
+                                style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                                value={middlepay}
+                            ></InputNumber>
+                        </Row>
+                        <Row>
+                            <span
+                                style={{
+                                    width: 100,
+                                    display: 'inline-block',
+                                    textAlign: 'right',
+                                }}
+                            >
+                                夜班补贴:
+                            </span>
+                            <InputNumber
+                                placeholder="请输入夜班补贴"
+                                onChange={value=> {
+                                    setNightpay(value)
+                                }}
+                                style={{ width: 200, marginLeft: 10, marginBottom: 10 }}
+                                value={nightpay}
                             ></InputNumber>
                         </Row>
                         <Row>

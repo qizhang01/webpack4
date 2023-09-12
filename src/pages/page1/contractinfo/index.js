@@ -1,132 +1,90 @@
 import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/Panel'
 import fetchApi from '@/ajax/index'
-import { Form, Input, Table, Button, Tabs, Checkbox,InputNumber} from 'antd'
-import { Auth } from '@/auth'
+import { Form, Input, Table, Button, Tabs, Space,InputNumber, DatePicker, Select, Timeline, Modal} from 'antd'
 import Icon, { PlusOutlined,SearchOutlined } from '@ant-design/icons'
-
-const columns = [
-    {
-        title: '合同编号',
-        dataIndex: 'contractid',
-        key: 'contractid',
-    },
-    {
-        title: '员工编号',
-        dataIndex: 'employeeid',
-        key: 'employeeid',
-    },
-    {
-        title: '姓名',
-        dataIndex: 'name',
-        key: 'name',
-    },
-    {
-        title: '项目部',
-        dataIndex: 'departmentname',
-        key: 'departmentname',
-    },
-    {
-        title: '初次入职时间',
-        dataIndex: 'firstworktime',
-        key: 'firstworktime',
-    },
-    {
-        title: '入职声明时间',
-        dataIndex: 'announcetime',
-        key: 'announcetime',
-    },
-    {
-        title: '用人单位',
-        dataIndex: 'companyserve',
-        key: 'companyserve',
-    },
-    {
-        title: '员工类型',
-        dataIndex: 'jobtype',
-        key: 'jobtype',
-        // render: (_, record) => <a></a>,
-    },
-    {
-        title: '合同类型',
-        dataIndex: 'contracttype',
-        key: 'contracttype',
-    },
-    {
-        title: '合同起始日期',
-        dataIndex: 'starttime',
-        key: 'starttime',
-    },
-    {
-        title: '合同结束日期',
-        dataIndex: 'endtime',
-        key: 'endtime',
-    },
-    {
-        title: '社保缴纳地',
-        dataIndex: 'sbaoaddress',
-        key: 'sbaoaddress',
-    },
-    {
-        title: '缴纳时间',
-        dataIndex: 'sbaotime',
-        key: 'sbaotime',
-    },
-    {
-        title: '社保转移地',
-        dataIndex: 'sbaochangeaddress',
-        key: 'sbaochangeaddress',
-    },
-    {
-        title: '社保转移时间',
-        dataIndex: 'sbaochangetime',
-        key: 'sbaochangetime',
-    },
-    {
-        title: '操作',
-        key: 'action',
-        render: (_, record) => (
-          <Space size="middle">
-            <a onClick={()=>toSignAgain(record.employeeid)}>签约</a>
-            <a onClick={()=>toLog(record.employeeid)}>历史</a>
-          </Space>
-        ),
-    },
-]
-
-toSignAgain = (employeeid) =>{
-
-}
-
-toLog = (employeeid)=>{
-
-}
-
-const onFinish= async (values)=>{
-
-}
+const { Option } = Select
 
 const ContractInput =() =>{
+    const [employeelist, setEmployeeList] = useState([])
+    const [identityid, setIdentityid] = useState("")
+    const [departmentname, setDepartmentname] = useState("")
+    const [employeeid, setEmployeeid] = useState("")
+    useEffect(()=>{
+        fetchEmployee()
+    },[])
     const formItemLayout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 12 },
     }
+    const onFinish= async (values)=>{
+        console.log(values,"3333333333333333333333333")
+    }
+    const fetchEmployee = async () => {
+        const {roles, departmentname} = JSON.parse(localStorage.getItem("xx-auth-key"))
+        const result = await fetchApi('api/applyallemployee', JSON.stringify({roles, departmentname}),'POST')
+        if (result.code == '200') {
+            const d = result.data
+            setEmployeeList(d)
+        } else {
+            message.info('查询失败, 请重新提交')
+        }
+    }
+
+    const selectEmployee = (identityid)=>{
+        setIdentityid(identityid)
+        let d = employeelist.filter(item => item.identityid==identityid)
+        setDepartmentname(d[0].departmentname)
+        setEmployeeid(d[0].employeeid)
+    }
+
     return (
         <Form name="config-form-onoroff" {...formItemLayout} onFinish={onFinish}>
-            <Form.Item label="姓名">
-                <Input placeholder="请输入姓名" />
+            <Form.Item
+                name="name"
+                label="请选择姓名"
+            >
+                <Select
+                    placeholder="请选择员工姓名"
+                    style={{ width: 280, display: 'block' }}
+                    onChange={selectEmployee}
+                >
+                    {employeelist.map(item => (
+                        <Option value={item.identityid} key={item.id}>
+                            {`${item.name}  ${item.identityid.substring(13)}`}
+                        </Option>
+                    ))}
+                </Select>
             </Form.Item>
             <Form.Item label="身份证号">
-                <Input placeholder="请输入身份证号" />
+                <Input placeholder="请输入身份证号" value={identityid} disabled/>
+            </Form.Item>
+            <Form.Item label="员工编号">
+                <Input placeholder="请输入员工编号" value={employeeid} disabled/>
             </Form.Item>
             <Form.Item label="项目部">
+                <Input placeholder="请输入项目部" value={departmentname} disabled/>
+            </Form.Item>
+            <Form.Item label="用人单位" name="company">
+                <Input placeholder="请输入单位" />
+            </Form.Item>
+            <Form.Item name="firsttime" label="初次入职时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
+                <DatePicker style={{ width: 280}}/>
+            </Form.Item>
+            <Form.Item label="合同类型" name="contracttype">
                 <Input placeholder="请输入项目部" />
             </Form.Item>
-            <Form.Item label="签约次数">
+            <Form.Item label="员工类型" name="employeetype">
+                <Input placeholder="请输入项目部" />
+            </Form.Item>
+            <Form.Item label="签约次数" name="number" rules={[{ required: true, message: '必须选择签约次数' }]}>
                 <InputNumber min={1} max={10} placeholder="请选择签约次数"/>
             </Form.Item>
-            <Form.Item label="是否完成签约">
-                <Checkbox>签约完成</Checkbox>
+            <Form.Item name="signstarttime" label="签约起始时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
+                <DatePicker style={{ width: 280}}/>
+            </Form.Item>
+            <Form.Item name="signendtime" label="签约终止时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
+                <DatePicker style={{ width: 280}}/>
             </Form.Item>
             <Form.Item wrapperCol={{ span: 8, offset: 9 }}>
                 <Button type="primary" htmlType="submit" block>
@@ -141,6 +99,111 @@ const PageSub = () => {
     const [dataSource, setDataSource] = useState([])
     const loginInfo = JSON.parse(localStorage.getItem('xx-auth-key') || '')
     const [searchName, setSearchName] = useState(undefined)
+    const [tableloading,setTableloading] = useState(true)
+    const tableOrginData = []
+    const columns = [
+        {
+            title: '合同编号',
+            dataIndex: 'contractid',
+            key: 'contractid',
+        },
+        {
+            title: '员工编号',
+            dataIndex: 'employeeid',
+            key: 'employeeid',
+        },
+        {
+            title: '姓名',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: '项目部',
+            dataIndex: 'departmentname',
+            key: 'departmentname',
+        },
+        {
+            title: '初次入职时间',
+            dataIndex: 'firstworktime',
+            key: 'firstworktime',
+        },
+        {
+            title: '入职声明时间',
+            dataIndex: 'announcetime',
+            key: 'announcetime',
+        },
+        {
+            title: '用人单位',
+            dataIndex: 'companyserve',
+            key: 'companyserve',
+        },
+        {
+            title: '员工类型',
+            dataIndex: 'jobtype',
+            key: 'jobtype',
+            // render: (_, record) => <a></a>,
+        },
+        {
+            title: '合同类型',
+            dataIndex: 'contracttype',
+            key: 'contracttype',
+        },
+        {
+            title: '合同起始日期',
+            dataIndex: 'starttime',
+            key: 'starttime',
+        },
+        {
+            title: '合同结束日期',
+            dataIndex: 'endtime',
+            key: 'endtime',
+        },
+        {
+            title: '社保缴纳地',
+            dataIndex: 'sbaoaddress',
+            key: 'sbaoaddress',
+        },
+        {
+            title: '缴纳时间',
+            dataIndex: 'sbaotime',
+            key: 'sbaotime',
+        },
+        {
+            title: '社保转移地',
+            dataIndex: 'sbaochangeaddress',
+            key: 'sbaochangeaddress',
+        },
+        {
+            title: '社保转移时间',
+            dataIndex: 'sbaochangetime',
+            key: 'sbaochangetime',
+        },
+        {
+            title: '操作',
+            key: 'action',
+            render: (_, record) => (
+              <Space size="middle">
+                <a onClick={() => toLog(record)}>签约历史</a>
+                {/* <a>签约历史</a> */}
+              </Space>
+            ),
+        },
+    ]
+    
+    const toLog = (record)=>{
+        const config = {
+            title: '签约历史',
+            content: (
+                <Timeline>
+                    <Timeline.Item>第一次 {record.firstworktime}</Timeline.Item>
+                    <Timeline.Item>第二次 2019/09/01</Timeline.Item>
+                </Timeline>
+            ),
+            onOk() {},
+        }
+        Modal.info(config)
+    }
+
 
     useEffect(() =>{
         getcontractinfo()
@@ -150,16 +213,18 @@ const PageSub = () => {
         const result = await fetchApi('api/getcontractinfo')
         if (result.code == 200) {
             setDataSource(result.data)
+            tableOrginData = result.data
         }
+        setTableloading(false)
     }
 
     const search =()=>{
-        // if(searchName){
-        //     const d = tableOrginData.filter(item=>item.name.includes(searchName))
-        //     setDataSource(d)
-        // }else{
-        //     setDataSource(tableOrginData)
-        // }
+        if(searchName){
+            const d = tableOrginData.filter(item=>item.name.includes(searchName))
+            setDataSource(d)
+        }else{
+            setDataSource(tableOrginData)
+        }
     }
 
     return (loginInfo.roles.includes('ADMIN') ? 
@@ -174,7 +239,7 @@ const PageSub = () => {
                         >
                             搜索
                     </Button>
-                    <Table dataSource={dataSource} columns={columns} size='small'/>;
+                    <Table dataSource={dataSource} loading ={tableloading} columns={columns} size='small'/>;
                 </Tabs.TabPane>
 
                 <Tabs.TabPane tab="合同录入" key="2">
