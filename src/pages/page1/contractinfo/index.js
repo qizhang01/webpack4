@@ -11,6 +11,7 @@ const ContractInput =() =>{
     const [departmentname, setDepartmentname] = useState("")
     const [employeeid, setEmployeeid] = useState("")
     const stl = { width: 280}
+    const [employeeType,setEmployeetype ]= useState("4")
     useEffect(()=>{
         fetchEmployee()
     },[])
@@ -37,6 +38,9 @@ const ContractInput =() =>{
         let d = employeelist.filter(item => item.identityid==identityid)
         setDepartmentname(d[0].departmentname)
         setEmployeeid(d[0].employeeid)
+    }
+    const selectEmployeeType = (key)=>{
+        setEmployeetype(key)
     }
 
     return (
@@ -66,10 +70,12 @@ const ContractInput =() =>{
                 <Select
                     placeholder="请选择类型"
                     style={{ width: 280, display: 'block' }}
+                    onChange={selectEmployeeType}
                 >
                     <Option value="提前离职" key="1">提前离职</Option>
                     <Option value="到期离职" key="2">到期离职</Option>
                     <Option value="到期续约" key="3">到期续约</Option>
+                    <Option value="首次入职" key="4">首次入职</Option>
                 </Select>
             </Form.Item>
             <Form.Item label="身份证号">
@@ -84,9 +90,11 @@ const ContractInput =() =>{
             <Form.Item label="用人单位" name="company">
                 <Input placeholder="请输入单位" style={stl}/>
             </Form.Item>
-            <Form.Item name="firsttime" label="初次入职时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
-                <DatePicker style={stl}/>
-            </Form.Item>
+            {employeeType=="4" && 
+                <Form.Item name="firsttime" label="初次入职时间" rules={[{ required: true, message: '必须输入签约时间' }]}>
+                    <DatePicker style={stl}/>
+                </Form.Item>
+            }
             <Form.Item label="合同类型" name="contracttype" rules={[{ required: true, message: '必须输入合同类型' }]}>
                 <Input placeholder="请输入合同类型" style={stl}/>
             </Form.Item>
@@ -235,7 +243,7 @@ const PageSub = () => {
 
     useEffect(() =>{
         getcontractinfo()
-    },[] )
+    },[])
 
     const getcontractinfo = async ()=> {
         const result = await fetchApi('api/getcontractinfo')
@@ -245,6 +253,12 @@ const PageSub = () => {
         }
         setTableloading(false)
     }
+
+    const onChange = (key) => {
+        if(key==1){
+            getcontractinfo()
+        }
+    };
 
     const search =()=>{
         if(searchName){
@@ -257,7 +271,7 @@ const PageSub = () => {
 
     return (loginInfo.roles.includes('ADMIN') ? 
         <Panel>
-            <Tabs defaultActiveKey="1">
+            <Tabs defaultActiveKey="1" onChange={onChange}>
                 <Tabs.TabPane tab="合同概览" key="1">
                     <Input placeholder="请输入员工名称" value={searchName} onChange={e=> setSearchName(e.target.value)} style={{width: 160, marginRight: 20}}/>
                     <Button
